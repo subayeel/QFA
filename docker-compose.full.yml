@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: qfa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: qfa_db
+      POSTGRES_USER: qfa_user
+      POSTGRES_PASSWORD: qfa_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - qfa-network
+
+  app:
+    build: .
+    container_name: qfa-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://qfa_user:qfa_password@postgres:5432/qfa_db
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=your-nextauth-secret-key-here
+    depends_on:
+      - postgres
+    networks:
+      - qfa-network
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: qfa-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@qfa.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    networks:
+      - qfa-network
+
+volumes:
+  postgres_data:
+
+networks:
+  qfa-network:
+    driver: bridge

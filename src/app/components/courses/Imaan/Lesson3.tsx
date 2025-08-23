@@ -1,0 +1,299 @@
+import { Check } from "lucide-react";
+
+function ImaanLesson3() {
+  return (
+    <main className="max-w-4xl mx-auto px-4 py-8">
+      <article className="prose prose-lg dark:prose-invert max-w-none">
+        {/* Introduction Section */}
+        <section id="introduction" className="mb-16 scroll-mt-20">
+          <h2 className="text-3xl  font-bold mb-6 text-gray-900 dark:text-gray-100">
+            Why There Can Only Be One God
+          </h2>
+
+          <p className="text-xl leading-relaxed mb-6 text-gray-700 dark:text-gray-300">
+            Now that we've established that there must be a Creator, let's
+            explore why there can only be one Creator and why this Creator must
+            be different from everything in our universe.
+          </p>
+          <p className="text-xl leading-relaxed text-gray-700 dark:text-gray-300">
+            We're going to use the same common sense approach to understand some
+            important aspects about who God really is. These ideas aren't
+            complicated—they're actually quite simple when we think about them
+            step by step.
+          </p>
+        </section>
+
+        {/* Creator vs Creation Section */}
+        <section id="creator-nature" className="mb-16 scroll-mt-20">
+          <h2 className="text-3xl  font-bold mb-6 text-gray-900 dark:text-gray-100">
+            The Creator Is Not Like Creation
+          </h2>
+
+          <p className="text-xl leading-relaxed mb-6 text-gray-700 dark:text-gray-300">
+            One of the first things we can figure out is that the Creator must
+            be fundamentally different from the universe. Think of it this
+            way—the artist is not the painting, the writer is not the book, and
+            the inventor is not the invention.
+          </p>
+
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 my-8">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              Why the Creator must be different:
+            </h3>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              Remember our earlier reasoning—the universe needs a creator
+              because:
+            </p>
+            <ul className="space-y-4 text-gray-700 dark:text-gray-300">
+              <li className="flex items-start gap-3">
+                <Check
+                  className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0"
+                  size={20}
+                />
+                <span>
+                  The universe couldn't come from nothing—you can't get
+                  something from nothing, especially something as vast and
+                  complex as our universe.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check
+                  className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0"
+                  size={20}
+                />
+                <span>
+                  The universe couldn't create itself—nothing can create itself
+                  before it exists!
+                </span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* Self-Creation Impossibility */}
+        <section id="self-creation" className="mb-16 scroll-mt-20">
+          <h2 className="text-3xl  font-bold mb-6 text-gray-900 dark:text-gray-100">
+            Could the Universe Create Itself?
+          </h2>
+
+          <p className="text-xl leading-relaxed mb-6 text-gray-700 dark:text-gray-300">
+            Think about this for a moment—how could the universe create itself?
+            That would mean it existed before it existed to create itself! It's
+            a logical impossibility.
+          </p>
+
+          <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-6 my-8">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              The Phone Example Revisited:
+            </h3>
+            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
+              Remember our mobile phone example? Would any rational person
+              believe:
+            </p>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 my-4 border-l-4 border-orange-300 dark:border-orange-600">
+              <p className="italic text-gray-700 dark:text-gray-300">
+                "This phone assembled itself into a working device, organized
+                all its components, wrote its own operating system, and designed
+                its own features."
+              </p>
+            </div>
+            <p className="mt-4 text-gray-700 dark:text-gray-300">
+              Of course not! We know complex, functional things require
+              intelligent design.
+            </p>
+          </div>
+        </section>
+
+        {/* Infinite Regression Section */}
+        <section id="infinite-regression" className="mb-16 scroll-mt-20">
+          <h2 className="text-3xl  font-bold mb-6 text-gray-900 dark:text-gray-100">
+            Who Created the Creator?
+          </h2>
+
+          <p className="text-xl leading-relaxed mb-6 text-gray-700 dark:text-gray-300">
+            This is where many people get stuck. They ask, "If everything needs
+            a creator, then who created God?" It's a good question!
+          </p>
+
+          <p className="text-xl leading-relaxed mb-6 text-gray-700 dark:text-gray-300">
+            But here's the logic problem: If we say God was created by another
+            creator, then who created that creator? And who created the creator
+            of the creator? We'd end up in an endless loop, going back forever.
+          </p>
+
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-6 my-8">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              The Table Lifting Example:
+            </h3>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              Imagine you want to lift a heavy table, but you can't do it alone:
+            </p>
+            <div className="space-y-4">
+              <div className="flex flex-col space-y-4">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                    Step 1:
+                  </p>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    You ask your friend to help
+                  </p>
+                </div>
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                    Step 2:
+                  </p>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    Your friend says: "I'll only help if someone else helps me
+                    first"
+                  </p>
+                </div>
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                    Result:
+                  </p>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    If this continues forever... the table will never be lifted!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <p className="mt-4 text-gray-700 dark:text-gray-300">
+              Similarly, if every creator needs another creator, nothing would
+              ever get created! But we know the universe exists, so this can't
+              be right.
+            </p>
+          </div>
+        </section>
+
+        {/* Uncreated Creator Section */}
+        <section id="uncreated-creator" className="mb-16 scroll-mt-20">
+          <h2 className="text-3xl  font-bold mb-6 text-gray-900 dark:text-gray-100">
+            The Uncreated Creator
+          </h2>
+
+          <p className="text-xl leading-relaxed mb-6 text-gray-700 dark:text-gray-300">
+            Using logical reasoning, we arrive at a sensible conclusion: There
+            must be an uncreated Creator—one that wasn't made or designed but
+            has always existed.
+          </p>
+
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 my-8">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              Qualities of the Uncreated Creator:
+            </h3>
+            <ul className="space-y-4 text-gray-700 dark:text-gray-300">
+              <li className="flex items-start gap-3">
+                <Check
+                  className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0"
+                  size={20}
+                />
+                <div>
+                  <strong className="text-gray-900 dark:text-gray-100">
+                    Self-sufficient:
+                  </strong>{" "}
+                  While creation depends on other things, the Creator depends on
+                  nothing.
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check
+                  className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0"
+                  size={20}
+                />
+                <div>
+                  <strong className="text-gray-900 dark:text-gray-100">
+                    Eternal:
+                  </strong>{" "}
+                  While creation has beginnings and endings, the Creator has
+                  always existed.
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check
+                  className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0"
+                  size={20}
+                />
+                <div>
+                  <strong className="text-gray-900 dark:text-gray-100">
+                    Beyond space and time:
+                  </strong>{" "}
+                  While we're confined by physical limits, the Creator exists
+                  beyond these limitations.
+                </div>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        {/* Oneness Section */}
+        <section id="oneness" className="mb-16 scroll-mt-20">
+          <h2 className="text-3xl  font-bold mb-6 text-gray-900 dark:text-gray-100">
+            Why There Can Only Be One
+          </h2>
+
+          <p className="text-xl leading-relaxed mb-6 text-gray-700 dark:text-gray-300">
+            Finally, we come to the question of God's oneness. Why must there be
+            just one Creator rather than many?
+          </p>
+
+          <p className="text-xl leading-relaxed mb-6 text-gray-700 dark:text-gray-300">
+            If there were multiple creators, they would limit each other. Each
+            would have boundaries where their power ends and another's begins.
+            But this would make them limited beings—more like very powerful
+            created beings rather than the unlimited Creator we've been
+            describing.
+          </p>
+
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6 my-8">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              The Logic of Oneness:
+            </h3>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              An unlimited, self-sufficient, eternal Creator must be one
+              because:
+            </p>
+            <ul className="space-y-4 text-gray-700 dark:text-gray-300">
+              <li className="flex items-start gap-3">
+                <Check
+                  className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0"
+                  size={20}
+                />
+                <span>
+                  Multiple creators would limit each other, making none of them
+                  truly unlimited
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check
+                  className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0"
+                  size={20}
+                />
+                <span>
+                  The perfect order of the universe suggests a single, unified
+                  intelligence behind its design
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check
+                  className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0"
+                  size={20}
+                />
+                <span>
+                  If multiple creators disagreed, there would be chaos rather
+                  than the harmony we observe
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+            This is why we conclude there is One God—One Creator who designed
+            this universe with perfect balance and harmony.
+          </p>
+        </section>
+      </article>
+    </main>
+  );
+}
+
+export default ImaanLesson3;
