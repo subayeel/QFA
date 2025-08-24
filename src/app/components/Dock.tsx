@@ -23,7 +23,7 @@ function Dock() {
   };
 
   return (
-    <div className="grid grid-cols-6 gap-4 items-center">
+    <div className="grid grid-cols-6 gap-1 items-center">
       <div className="col-span-5 bg-black h-fit p-1 w-full backdrop-blur-sm border-2 border-white/20 rounded-full grid grid-cols-4 items-center place-content-center">
         <div
           className={`rounded-full m-auto p-3 w-fit ${
