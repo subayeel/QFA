@@ -1,0 +1,257 @@
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { SignOutButton } from "@/app/components/SignOutButton";
+import {
+  Target,
+  Heart,
+  Users,
+  Gift,
+  Plus,
+  GraduationCap,
+  Calendar,
+} from "lucide-react";
+
+export default async function UserProfilePage() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/auth/login");
+  }
+
+  // Static data for demonstration
+  const profileData = {
+    name: session.user.name || "User",
+    age: 12,
+    gender: "Male",
+    profession: "Student",
+    goals: ["Complete Hifz", "Learn Arabic Grammar", "Memorize 40 Hadith"],
+    location: "Dubai, UAE",
+  };
+
+  const progressData = {
+    courses: [
+      { name: "Hifz Progress", progress: 75 },
+      { name: "Salah ", progress: 100 },
+      { name: "Zikr ", progress: 75 },
+      { name: "Arabic Grammar", progress: 45 },
+      { name: "Islamic History", progress: 60 },
+    ],
+    hifzProgress: {
+      current: 15,
+      total: 30,
+      percentage: 50,
+    },
+    todayTodos: {
+      completed: 8,
+      total: 12,
+      percentage: 67,
+    },
+  };
+
+  const actions = [
+    {
+      title: "Assign Goals",
+      description: "Set new learning objectives",
+      icon: Target,
+      color: "bg-blue-50 text-blue-600",
+    },
+    {
+      title: "Create Todo",
+      description: "Add new tasks to your list",
+      icon: Plus,
+      color: "bg-green-50 text-green-600",
+    },
+    {
+      title: "Donate",
+      description: "Support Islamic causes",
+      icon: Heart,
+      color: "bg-red-50 text-red-600",
+    },
+    {
+      title: "Request Charity",
+      description: "Anonymous charity requests",
+      icon: Gift,
+      color: "bg-purple-50 text-purple-600",
+    },
+    {
+      title: "Guide My Friend",
+      description: "Help others in their journey",
+      icon: Users,
+      color: "bg-orange-50 text-orange-600",
+    },
+  ];
+
+  return (
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Profile Card */}
+        <Card className="p-6 sm:p-8 mb-8 bg-white/80 backdrop-blur-sm shadow-none border">
+          <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+            <div className="flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 sm:mb-6">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                  {profileData.name}
+                </h2>
+                <Badge
+                  variant="secondary"
+                  className="bg-teal-100 text-teal-800 w-fit"
+                >
+                  {profileData.age} years old
+                </Badge>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+                  <span className="text-gray-600">{profileData.gender}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4 text-gray-500" />
+                  <span className="text-gray-600">
+                    {profileData.profession}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-gray-500" />
+                  <span className="text-gray-600">{profileData.location}</span>
+                </div>
+              </div>
+
+              {/* Goals */}
+              <div className="mt-4">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Current Goals
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {profileData.goals.map((goal, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="bg-white text-sm"
+                    >
+                      {goal}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sign Out Button */}
+              <div className="mt-6">
+                <SignOutButton />
+              </div>
+            </div>
+
+            {/* Profile Image */}
+            {session.user.image && (
+              <div className="flex-shrink-0">
+                <img
+                  src={session.user.image}
+                  alt="Profile"
+                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-lg"
+                />
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* Progress Tracking */}
+        <div className="mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            Progress
+          </h2>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {/* Courses Progress */}
+            <Card className="p-6 sm:p-8 bg-white/80 backdrop-blur-sm border shadow-none lg:col-span-1 xl:col-span-2">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                  Tracking Your Progress
+                </h3>
+              </div>
+
+              <div className="space-y-4 sm:space-y-6">
+                {progressData.courses.map((course, index) => (
+                  <div key={index}>
+                    <div className="flex justify-between items-center mb-2 sm:mb-3">
+                      <span className="text-sm sm:text-base font-medium text-gray-700">
+                        {course.name}
+                      </span>
+                      <span className="text-sm sm:text-base text-gray-500">
+                        {course.progress}%
+                      </span>
+                    </div>
+                    <Progress value={course.progress} className="h-2 sm:h-3" />
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Today's Todos */}
+            <Card className="p-6 sm:p-8 bg-white/80 backdrop-blur-sm border shadow-none">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                  Today&apos;s Tasks
+                </h3>
+              </div>
+
+              <div className="text-center">
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-orange-600 mb-3 sm:mb-4">
+                  {progressData.todayTodos.completed}/
+                  {progressData.todayTodos.total}
+                </div>
+                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
+                  Tasks Completed
+                </p>
+                <Progress
+                  value={progressData.todayTodos.percentage}
+                  className="h-3 sm:h-4"
+                />
+                <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">
+                  {progressData.todayTodos.percentage}% Complete
+                </p>
+              </div>
+            </Card>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center gap-2">
+            Quick Actions
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
+            {actions.map((action, index) => (
+              <Card
+                key={index}
+                className="p-4 sm:p-6 bg-white/80 backdrop-blur-sm border shadow-none hover:shadow-xl transition-all duration-300 cursor-pointer group"
+              >
+                <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-center sm:items-start lg:items-center xl:items-start gap-4 text-center sm:text-left lg:text-center xl:text-left">
+                  {/* Image Placeholder */}
+                  <div
+                    className={`w-16 h-16 sm:w-20 sm:h-20 lg:w-16 lg:h-16 xl:w-20 xl:h-20 rounded-2xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
+                  >
+                    <action.icon className="w-8 h-8 sm:w-10 sm:h-10 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg sm:text-xl lg:text-lg xl:text-xl font-semibold text-gray-900 m-0 mb-1 sm:mb-2">
+                      {action.title}
+                    </h3>
+                    <p className="text-sm sm:text-base lg:text-sm xl:text-base text-gray-600">
+                      {action.description}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

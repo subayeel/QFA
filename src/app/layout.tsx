@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { SessionProvider } from "@/components/session-provider";
+import Dock from "./components/Dock";
 
 const outfit = localFont({
   src: [
@@ -65,10 +66,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="pb-[80px]">
       <body className={`${outfit.variable} antialiased`}>
         <SessionProvider>{children}</SessionProvider>
       </body>
+      <footer className="fixed bottom-4 left-1/2 transform -translate-x-1/2  w-full px-6 max-w-[300px]">
+        <Dock />
+      </footer>
     </html>
   );
 }

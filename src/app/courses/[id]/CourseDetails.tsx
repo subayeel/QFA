@@ -58,7 +58,7 @@ function CourseDetails({
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-md md:text-lg font-medium text-gray-900 truncate">
+                    <p className="text-md md:text-lg font-medium text-gray-900 truncate max-w-[200px] text-wrap">
                       {lesson.lessonName}
                     </p>
                     {lesson.lessonDescription && (
