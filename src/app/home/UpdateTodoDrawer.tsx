@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TodoService } from "@/services/todoService";
-import { CreateTodoData } from "@/types/todos.types";
+import { UserTodo } from "@/types/todos.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,22 +23,35 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Plus } from "lucide-react";
+import { Edit } from "lucide-react";
 
-interface CreateTodoDrawerProps {
-  onTodoCreated: () => void;
+interface UpdateTodoDrawerProps {
+  todo: UserTodo;
+  onTodoUpdated: () => void;
 }
 
-function CreateTodoDrawer({ onTodoCreated }: CreateTodoDrawerProps) {
+function UpdateTodoDrawer({ todo, onTodoUpdated }: UpdateTodoDrawerProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<CreateTodoData>({
-    title: "",
-    description: "",
-    time: "",
-    date: new Date().toISOString().split("T")[0],
-    category: "personal",
-    priority: "medium",
+  const [formData, setFormData] = useState({
+    title: todo.todo.title,
+    description: todo.todo.description || "",
+    time: todo.todo.time || "",
+    date: new Date(todo.date).toISOString().split("T")[0],
+    category: todo.todo.category || "personal",
+    priority: todo.todo.priority,
   });
+
+  // Update form data when todo prop changes
+  useEffect(() => {
+    setFormData({
+      title: todo.todo.title,
+      description: todo.todo.description || "",
+      time: todo.todo.time || "",
+      date: new Date(todo.date).toISOString().split("T")[0],
+      category: todo.todo.category || "personal",
+      priority: todo.todo.priority,
+    });
+  }, [todo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,29 +61,41 @@ function CreateTodoDrawer({ onTodoCreated }: CreateTodoDrawerProps) {
       return;
     }
 
+    // Prevent updating suggested todos
+    if (todo.todo.type === "suggested") {
+      alert("Cannot update suggested todos. They are system-generated.");
+      return;
+    }
+
     try {
-      await TodoService.createTodo(formData);
-      setFormData({
-        title: "",
-        description: "",
-        time: "",
-        date: new Date().toISOString().split("T")[0],
-        category: "personal",
-        priority: "medium",
+      await TodoService.updateTodo(todo.id, {
+        title: formData.title,
+        description: formData.description || undefined,
+        time: formData.time || undefined,
+        date: formData.date,
+        category: formData.category as
+          | "prayer"
+          | "quran"
+          | "dhikr"
+          | "charity"
+          | "learning"
+          | "personal",
+        priority: formData.priority as "high" | "medium" | "low",
       });
+
       setOpen(false);
-      onTodoCreated();
+      onTodoUpdated();
     } catch (error) {
-      console.error("Error creating todo:", error);
+      console.error("Error updating todo:", error);
       if (error instanceof Error) {
         alert(error.message);
       } else {
-        alert("Failed to create todo. Please try again.");
+        alert("Failed to update todo. Please try again.");
       }
     }
   };
 
-  const handleInputChange = (field: keyof CreateTodoData, value: string) => {
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -80,17 +105,23 @@ function CreateTodoDrawer({ onTodoCreated }: CreateTodoDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline" size="icon" className="rounded-full">
-          <Plus className="h-4 w-4" />
-        </Button>
+        <button
+          className={`flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded ${
+            todo.todo.type === "suggested"
+              ? "text-gray-400 cursor-not-allowed"
+              : "hover:bg-gray-100"
+          }`}
+          disabled={todo.todo.type === "suggested"}
+        >
+          <Edit className="h-4 w-4" />
+          {todo.todo.type === "suggested" ? "Update (System)" : "Update"}
+        </button>
       </DrawerTrigger>
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
           <DrawerHeader>
-            <DrawerTitle>Create New Todo</DrawerTitle>
-            <DrawerDescription>
-              Add a new task to your daily routine
-            </DrawerDescription>
+            <DrawerTitle>Update Todo</DrawerTitle>
+            <DrawerDescription>Update your existing task</DrawerDescription>
           </DrawerHeader>
 
           <form onSubmit={handleSubmit} className="px-4 space-y-4">
@@ -185,7 +216,7 @@ function CreateTodoDrawer({ onTodoCreated }: CreateTodoDrawerProps) {
 
           <DrawerFooter>
             <Button onClick={handleSubmit} className="w-full">
-              Create Todo
+              Update Todo
             </Button>
             <DrawerClose asChild>
               <Button variant="outline" className="w-full">
@@ -199,4 +230,4 @@ function CreateTodoDrawer({ onTodoCreated }: CreateTodoDrawerProps) {
   );
 }
 
-export default CreateTodoDrawer;
+export default UpdateTodoDrawer;

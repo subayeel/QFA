@@ -18,6 +18,11 @@ model User {
   sessions      Session[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
+  userTodos     UserTodo[]
+  
+  // Course progress tracking - arrays of completed lesson and task IDs
+  completedLessons String[] @default([]) // Array of lesson IDs (e.g., ["SalahLesson1", "ImaanLesson2"])
+  completedTasks   String[] @default([]) // Array of task IDs (e.g., ["1", "2"])
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -77,3 +82,72 @@ model Authenticator {
  
   @@id([userId, credentialID])
 }
+
+// Base todo definitions (reusable)
+model Todo {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  time        String?
+  category    String?  // "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal"
+  priority    String   @default("medium") // "high" | "medium" | "low"
+  timePriority Int?
+  type        String   @default("custom") // "custom" or "suggested"
+  
+  // Relationships
+  userTodos   UserTodo[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([category])
+}
+
+// User-specific todo instances with tracking
+model UserTodo {
+  id          String   @id @default(cuid())
+  date        DateTime
+  completed   Boolean  @default(false)
+  missed      Boolean  @default(false)
+  archived    Boolean  @default(false)
+  
+  // Relationships
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  todoId      String
+  todo        Todo     @relation(fields: [todoId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, todoId, date]) // Prevent duplicate todos on same date
+  @@index([userId, date])
+  @@index([userId, completed])
+  @@index([userId, archived])
+  @@index([todoId])
+}
+
+// Predefined suggested todos
+model SuggestedTodo {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  time        String?
+  category    String   // "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal"
+  priority    String   @default("medium") // "high" | "medium" | "low"
+  timePriority Int?
+  
+  // When this todo should be suggested (e.g., "daily", "weekly", "monthly")
+  frequency   String   @default("daily") // "daily", "weekly", "monthly", "custom"
+  
+  // For custom frequency, store the logic (e.g., "prayer_times", "hijri_date")
+  customLogic String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([frequency])
+}
+

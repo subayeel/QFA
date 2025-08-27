@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 import { useState, useEffect, useCallback } from "react";
-import { Todo, TodoFilter } from "@/types/todos.types";
+import { UserTodo, TodoFilter } from "@/types/todos.types";
 import { TodoService } from "@/services/todoService";
 import TodoTile from "./TodoTile";
 import CreateTodoDrawer from "./CreateTodoDrawer";
@@ -36,9 +36,10 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { SignOutButton } from "@/app/components/SignOutButton";
 
 function Home() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<UserTodo[]>([]);
   const [currentFilter, setCurrentFilter] = useState<TodoFilter>("today");
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [location, setLocation] = useState<LocationData | null>(null);
@@ -55,6 +56,12 @@ function Home() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState<{
+    name?: string;
+    email?: string;
+  } | null>(null);
 
   // Function to determine current prayer time
   const getCurrentPrayer = () => {
@@ -104,41 +111,76 @@ function Home() {
 
   const currentPrayer = getCurrentPrayer();
 
-  const loadTodos = useCallback(async () => {
+  // Check authentication status
+  const checkAuthStatus = useCallback(async () => {
     try {
-      // Initialize suggested todos if needed
-      await TodoService.initializeSuggestedTodos();
+      const response = await fetch("/api/todos/check-auth");
+      if (response.ok) {
+        const data = await response.json();
+        setIsAuthenticated(data.authenticated);
+        if (data.authenticated && data.user) {
+          setUserInfo(data.user);
+        }
+      } else {
+        setIsAuthenticated(false);
+        setUserInfo(null);
+      }
+    } catch (error) {
+      console.error("Error checking auth status:", error);
+      setIsAuthenticated(false);
+      setUserInfo(null);
+    } finally {
+      setAuthLoading(false);
+    }
+  }, []);
 
-      // Load todos based on current filter
-      let filteredTodos = await TodoService.getTodosByFilter(
+  const loadTodos = useCallback(async () => {
+    // Only load todos if user is authenticated
+    if (!isAuthenticated) {
+      setTodos([]);
+      return;
+    }
+
+    try {
+      // Use the new combined todos method that handles both user and suggested todos
+      const combinedTodos = await TodoService.getCombinedTodos(
         currentFilter,
         prayerTimes || undefined
       );
 
       // Filter out expired todos and apply time-based logic
-      filteredTodos = filteredTodos.filter((todo) =>
+      const filteredTodos = combinedTodos.filter((todo) =>
         shouldShowTodo(todo, prayerTimes)
       );
-
-      // Smart sorting is already applied by TodoService, but we can apply additional time-based sorting if needed
-      // filteredTodos = sortTodosByTime(filteredTodos, prayerTimes);
 
       setTodos(filteredTodos);
     } catch (error) {
       console.error("Error loading todos:", error);
+      // Show error to user
+      setError("Failed to load todos. Please try again.");
     }
-  }, [currentFilter, prayerTimes]);
+  }, [currentFilter, prayerTimes, isAuthenticated]);
 
-  const handleTodoUpdate = async (updatedTodo: Todo) => {
-    setTodos((prev) =>
-      prev.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
-    );
-    await loadTodos(); // Reload to update stats
+  const handleTodoUpdate = async (updatedTodo: UserTodo) => {
+    try {
+      setTodos((prev) =>
+        prev.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+      );
+      await loadTodos(); // Reload to update stats
+    } catch (error) {
+      console.error("Error updating todo:", error);
+      setError("Failed to update todo. Please try again.");
+    }
   };
 
   const handleTodoDelete = async (id: string) => {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-    await loadTodos(); // Reload to update stats
+    try {
+      setTodos((prev) => prev.filter((todo) => todo.id !== id));
+      await loadTodos(); // Reload to update stats
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+      setError("Failed to delete todo. Please try again.");
+    }
   };
 
   const handleFilterChange = (filter: TodoFilter) => {
@@ -146,8 +188,18 @@ function Home() {
   };
 
   const handleTodoCreated = useCallback(async () => {
-    await loadTodos();
+    try {
+      await loadTodos();
+    } catch (error) {
+      console.error("Error after creating todo:", error);
+      setError("Failed to refresh todos. Please try again.");
+    }
   }, [loadTodos]);
+
+  // Check authentication status on mount
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   // Load location and prayer times
   useEffect(() => {
@@ -216,16 +268,18 @@ function Home() {
       const prayerInfo = getCurrentPrayerInfo(prayerTimes);
       setCurrentPrayerInfo(prayerInfo);
 
-      // Reload todos to handle time-based changes
-      await loadTodos();
+      // Reload todos to handle time-based changes (only if authenticated)
+      if (isAuthenticated) {
+        await loadTodos();
+      }
     }, 60000); // Update every minute
 
     return () => clearInterval(interval);
-  }, [prayerTimes, loadTodos]);
+  }, [prayerTimes, loadTodos, isAuthenticated]);
 
   useEffect(() => {
     loadTodos();
-  }, [currentFilter, prayerTimes, loadTodos]);
+  }, [currentFilter, prayerTimes, loadTodos, isAuthenticated]);
 
   // Carousel auto-scroll effect
   useEffect(() => {
@@ -298,12 +352,15 @@ function Home() {
         <div className="text-black/80">
           <p className="text-xl lg:text-2xl">Assalamualaikum,</p>
           <p className="text-3xl lg:text-4xl font-semibold tracking-wide">
-            Abdul Qadir
+            {!authLoading && isAuthenticated && userInfo?.name
+              ? userInfo.name
+              : "Abdul Qadir"}
           </p>
         </div>
 
-        <div className="flex text-greyText gap-4">
+        <div className="flex text-greyText gap-4 items-center">
           <Bell size={24} className="lg:w-6 lg:h-6" />
+          {!authLoading && isAuthenticated && <SignOutButton />}
         </div>
       </div>
 
@@ -681,86 +738,130 @@ function Home() {
         </Card>
       </div>
 
-      {/* Task For today */}
-      <div className="px-6 space-y-4 lg:px-8 lg:space-y-6">
-        <div className="flex justify-between items-center lg:max-w-4xl lg:mx-auto">
-          <div className="flex gap-2 py-1">
-            <span
-              className={cn(
-                "px-3 py-1 shadow rounded-full text-sm border font-medium hover:cursor-pointer hover:bg-secondary/50 lg:px-4 lg:py-2 lg:text-base",
-                currentFilter === "today"
-                  ? "bg-secondary text-black"
-                  : "bg-white text-black"
-              )}
-              onClick={() => handleFilterChange("today")}
-            >
-              Today
-            </span>
-            <span
-              className={cn(
-                "px-3 py-1 shadow rounded-full text-sm border font-medium hover:cursor-pointer hover:bg-secondary/50 lg:px-4 lg:py-2 lg:text-base",
-                currentFilter === "upcoming"
-                  ? "bg-secondary text-black"
-                  : "bg-white text-black"
-              )}
-              onClick={() => handleFilterChange("upcoming")}
-            >
-              Upcoming
-            </span>
-            <span
-              className={cn(
-                "px-3 py-1 shadow rounded-full text-sm border font-medium hover:cursor-pointer hover:bg-secondary/50 lg:px-4 lg:py-2 lg:text-base",
-                currentFilter === "archived"
-                  ? "bg-secondary text-black"
-                  : "bg-white text-black"
-              )}
-              onClick={() => handleFilterChange("archived")}
-            >
-              Archived
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 text-xs text-gray-500 lg:text-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Live</span>
-            </div>
-            <CreateTodoDrawer onTodoCreated={handleTodoCreated} />
-          </div>
-        </div>
-
-        {/* Todos List */}
-        <div className="space-y-3 lg:max-w-4xl lg:mx-auto">
-          {groupedTodos.length === 0 ? (
-            <Card className="shadow-none border p-8 text-center lg:p-12">
-              <p className="text-gray-500 lg:text-lg">
-                {currentFilter === "today" && "No todos for today"}
-                {currentFilter === "upcoming" && "No upcoming todos"}
-                {currentFilter === "archived" && "No archived todos"}
-              </p>
-            </Card>
-          ) : (
-            groupedTodos.map(([dateKey, dateTodos]) => (
-              <div key={dateKey} className="space-y-2">
-                {currentFilter === "upcoming" && (
-                  <h3 className="text-sm font-medium text-gray-700 px-1 lg:text-base">
-                    {formatDate(dateKey)}
-                  </h3>
+      {/* Task For today - Only show if authenticated */}
+      {!authLoading && isAuthenticated && (
+        <div className="px-6 space-y-4 lg:px-8 lg:space-y-6">
+          <div className="flex justify-between items-center lg:max-w-4xl lg:mx-auto">
+            <div className="flex gap-2 py-1">
+              <span
+                className={cn(
+                  "px-3 py-1 shadow rounded-full text-sm border font-medium hover:cursor-pointer hover:bg-secondary/50 lg:px-4 lg:py-2 lg:text-base",
+                  currentFilter === "today"
+                    ? "bg-secondary text-black"
+                    : "bg-white text-black"
                 )}
-                {dateTodos.map((todo) => (
-                  <TodoTile
-                    key={todo.id}
-                    todo={todo}
-                    onUpdate={handleTodoUpdate}
-                    onDelete={handleTodoDelete}
-                    prayerTimes={prayerTimes}
-                  />
-                ))}
+                onClick={() => handleFilterChange("today")}
+              >
+                Today
+              </span>
+              <span
+                className={cn(
+                  "px-3 py-1 shadow rounded-full text-sm border font-medium hover:cursor-pointer hover:bg-secondary/50 lg:px-4 lg:py-2 lg:text-base",
+                  currentFilter === "upcoming"
+                    ? "bg-secondary text-black"
+                    : "bg-white text-black"
+                )}
+                onClick={() => handleFilterChange("upcoming")}
+              >
+                Upcoming
+              </span>
+              <span
+                className={cn(
+                  "px-3 py-1 shadow rounded-full text-sm border font-medium hover:cursor-pointer hover:bg-secondary/50 lg:px-4 lg:py-2 lg:text-base",
+                  currentFilter === "archived"
+                    ? "bg-secondary text-black"
+                    : "bg-white text-black"
+                )}
+                onClick={() => handleFilterChange("archived")}
+              >
+                Archived
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 text-xs text-gray-500 lg:text-sm">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span>Live</span>
               </div>
-            ))
-          )}
+              <CreateTodoDrawer onTodoCreated={handleTodoCreated} />
+            </div>
+          </div>
+
+          {/* Todos List */}
+          <div className="space-y-3 lg:max-w-4xl lg:mx-auto">
+            {groupedTodos.length === 0 ? (
+              <Card className="shadow-none border p-8 text-center lg:p-12">
+                <p className="text-gray-500 lg:text-lg">
+                  {currentFilter === "today" && "No todos for today"}
+                  {currentFilter === "upcoming" && "No upcoming todos"}
+                  {currentFilter === "archived" && "No archived todos"}
+                </p>
+              </Card>
+            ) : (
+              groupedTodos.map(([dateKey, dateTodos]) => (
+                <div key={dateKey} className="space-y-2">
+                  {currentFilter === "upcoming" && (
+                    <h3 className="text-sm font-medium text-gray-700 px-1 lg:text-base">
+                      {formatDate(dateKey)}
+                    </h3>
+                  )}
+                  {dateTodos.map((todo) => (
+                    <TodoTile
+                      key={todo.id}
+                      todo={todo}
+                      onUpdate={handleTodoUpdate}
+                      onDelete={handleTodoDelete}
+                      onTodoUpdated={handleTodoCreated}
+                      prayerTimes={prayerTimes}
+                    />
+                  ))}
+                </div>
+              ))
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Show loading while checking authentication */}
+      {authLoading && (
+        <div className="px-6 py-8 lg:px-8 lg:py-12">
+          <div className="max-w-4xl mx-auto">
+            <Card className="shadow-none border p-8 text-center lg:p-12">
+              <div className="space-y-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
+                <p className="text-gray-600">Checking authentication...</p>
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Show login prompt if not authenticated */}
+      {!authLoading && !isAuthenticated && (
+        <div className="px-6 py-8 lg:px-8 lg:py-12">
+          <div className="max-w-4xl mx-auto">
+            <Card className="shadow-none border p-8 text-center lg:p-12">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold text-gray-900 lg:text-3xl">
+                  Sign in to Manage Your Todos
+                </h2>
+                <p className="text-gray-600 lg:text-lg">
+                  Create and manage your daily Islamic tasks, track your
+                  progress, and stay organized with your spiritual routine.
+                </p>
+                <div className="flex justify-center">
+                  <Button
+                    onClick={() => (window.location.href = "/auth/login")}
+                    className="px-6 py-2"
+                  >
+                    Sign In
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
 
       {/* Learning Access */}
       <div className="px-6 py-8 lg:px-8 lg:py-12">
@@ -774,7 +875,7 @@ function Home() {
           <Card className="p-3 shadow-none bg-[#F1DFDD] relative cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 active:shadow-inner lg:p-6 lg:h-[200px]">
             <div className="flex items-center gap-2">
               <p className="text-3xl font-semibold tracking-wide text-black/80 lg:text-4xl">
-                Imaan Booster
+                Faith
               </p>
             </div>
             <p className="text-sm text-black/50 font-medium lg:text-base">

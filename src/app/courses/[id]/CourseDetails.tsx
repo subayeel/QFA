@@ -1,6 +1,13 @@
 "use client";
 import { CourseDetailsType, Lesson } from "@/types/course.types";
-import { Bookmark, CheckCircle, ChevronLeft, Clock, Play } from "lucide-react";
+import {
+  Bookmark,
+  CheckCircle,
+  ChevronLeft,
+  Clock,
+  Play,
+  Check,
+} from "lucide-react";
 import { useState } from "react";
 import {
   Drawer,
@@ -9,24 +16,30 @@ import {
   DrawerTitle,
   DrawerDescription,
 } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { useCourseProgress } from "@/hooks/useCourseProgress";
 import Link from "next/link";
 
 function CourseDetails({
   courseDetails,
-  completedLessons,
 }: {
   courseDetails: CourseDetailsType;
-  completedLessons: string[];
-  completedTasks: string[];
 }) {
-  console.log("courseDetails", courseDetails);
+  const { toast } = useToast();
+  const { courseProgress, completeLesson, completeTask } = useCourseProgress();
+
+  // Filter completed lessons and tasks for this specific course
+  const completedLessons = [...new Set(courseProgress?.completedLessons)];
+  const completedTasks = [...new Set(courseProgress?.completedTasks)];
+
   const [selectedContent, setSelectedContent] = useState<
     "lessons" | "tasks" | "details"
   >("lessons");
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const handleLessonClick = (lesson: Lesson) => {
+  const handleLessonClick = async (lesson: Lesson) => {
     setSelectedLesson(lesson);
     setIsDrawerOpen(true);
   };
@@ -39,13 +52,17 @@ function CourseDetails({
             {courseDetails.lessons.map((lesson) => (
               <div
                 key={lesson.id}
-                className="flex gap-2 py-3 px-4 md:py-4 md:px-6 items-center justify-between rounded-2xl bg-gray-100 hover:bg-gray-200 cursor-pointer transition-colors duration-200"
+                className={`flex gap-2 py-3 px-4 md:py-4 md:px-6 items-center justify-between rounded-2xl cursor-pointer transition-colors duration-200 ${
+                  completedLessons.includes(lesson.id)
+                    ? "bg-green-50 hover:bg-green-100 border border-green-200"
+                    : "bg-gray-100 hover:bg-gray-200"
+                }`}
                 onClick={() => handleLessonClick(lesson)}
               >
                 <div className="flex gap-2 md:gap-4 items-center flex-1">
                   <div>
                     {completedLessons.includes(lesson.id) ? (
-                      <div className="w-6 h-6 md:w-8 md:h-8 bg-lime-200 text-lime-700 rounded-full flex items-center justify-center">
+                      <div className="w-6 h-6 md:w-8 md:h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
                         <CheckCircle size={20} className="md:w-6 md:h-6" />
                       </div>
                     ) : (
@@ -58,11 +75,23 @@ function CourseDetails({
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-md md:text-lg font-medium text-gray-900 truncate max-w-[200px] text-wrap">
+                    <p
+                      className={`text-md md:text-lg font-medium truncate max-w-[200px] text-wrap ${
+                        completedLessons.includes(lesson.id)
+                          ? "text-green-800"
+                          : "text-gray-900"
+                      }`}
+                    >
                       {lesson.lessonName}
                     </p>
                     {lesson.lessonDescription && (
-                      <p className="text-sm text-gray-600 mt-1 hidden md:block line-clamp-2">
+                      <p
+                        className={`text-sm mt-1 hidden md:block line-clamp-2 ${
+                          completedLessons.includes(lesson.id)
+                            ? "text-green-600"
+                            : "text-gray-600"
+                        }`}
+                      >
                         {lesson.lessonDescription}
                       </p>
                     )}
@@ -118,9 +147,34 @@ function CourseDetails({
                       )}
                     </div>
                     <div className="ml-4">
-                      <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                        <div className="w-3 h-3 md:w-4 md:h-4 bg-amber-500 rounded-full"></div>
-                      </div>
+                      {completedTasks.includes(task.id) ? (
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-green-100 rounded-full flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
+                        </div>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={async () => {
+                            try {
+                              await completeTask(task.id);
+                              toast({
+                                title: "Task completed!",
+                                description: `You've completed "${task.taskName}"`,
+                              });
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: "Failed to mark task as complete",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                          className="w-8 h-8 md:w-10 md:h-10 p-0"
+                        >
+                          <Check className="w-3 h-3 md:w-4 md:h-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -315,6 +369,38 @@ function CourseDetails({
                 ) : (
                   <selectedLesson.lessonContent />
                 )}
+
+                {/* Complete Lesson Button */}
+                <div className="mt-8 pt-6 border-t">
+                  {completedLessons.includes(selectedLesson.id) ? (
+                    <div className="flex items-center justify-center gap-2 text-green-600 bg-green-50 py-3 px-4 rounded-lg">
+                      <CheckCircle className="w-5 h-5" />
+                      <span className="font-medium">Lesson Completed</span>
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={async () => {
+                        try {
+                          await completeLesson(selectedLesson.id);
+                          toast({
+                            title: "Lesson completed!",
+                            description: `You've completed "${selectedLesson.lessonName}"`,
+                          });
+                        } catch (error) {
+                          toast({
+                            title: "Error",
+                            description: "Failed to mark lesson as complete",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      className="w-full"
+                    >
+                      <Check className="w-4 h-4 mr-2" />
+                      Mark as Complete
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
           </div>

@@ -115,7 +115,9 @@ export const getCurrentTimePeriod = ():
  * @param prayerTimes - Current prayer times
  * @returns True if todo should be shown
  */
-export const shouldShowTodo = (todo: any, prayerTimes?: any): boolean => {
+export const shouldShowTodo = (userTodo: any, prayerTimes?: any): boolean => {
+  const todo = userTodo.todo;
+
   // If no time specified, always show
   if (!todo.time) return true;
 

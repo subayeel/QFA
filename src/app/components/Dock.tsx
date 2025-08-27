@@ -9,11 +9,11 @@ function Dock() {
   // Get the current path and determine active tab
   const getActiveTab = () => {
     const path = location;
-    if (path === "/" || path === "/home") return "home";
+    if (path === "/home") return "home";
     if (path.startsWith("/calendar")) return "calendar";
     if (path.startsWith("/courses")) return "courses";
     if (path.startsWith("/self")) return "self";
-    return "home"; // default fallback
+    return "/"; // default fallback
   };
 
   const activeTab = getActiveTab();
@@ -74,7 +74,7 @@ function Dock() {
         className="bg-black w-fit h-fit py-1 px-2 backdrop-blur-sm border-2 border-white/20 rounded-full items-center place-content-center gap-4 aspect-square"
       >
         <div className="rounded-full m-auto aspect-square w-fit flex items-center justify-center p-2">
-          <MessageCircle size={28} color="white" />
+          <MessageCircle size={28} className="text-gray-300" />
         </div>
       </a>
     </div>

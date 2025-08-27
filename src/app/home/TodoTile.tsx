@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef } from "react";
-import { Todo } from "@/types/todos.types";
+import { UserTodo } from "@/types/todos.types";
 import { TodoService } from "@/services/todoService";
+import UpdateTodoDrawer from "./UpdateTodoDrawer";
 import {
   Check,
   MoreVertical,
@@ -26,42 +27,88 @@ import {
 } from "@/utils/timeUtils";
 
 interface TodoTileProps {
-  todo: Todo;
-  onUpdate: (todo: Todo) => void;
+  todo: UserTodo;
+  onUpdate: (todo: UserTodo) => void;
   onDelete: (id: string) => void;
+  onTodoUpdated: () => void;
   prayerTimes?: any;
 }
 
-function TodoTile({ todo, onUpdate, onDelete, prayerTimes }: TodoTileProps) {
+function TodoTile({
+  todo,
+  onUpdate,
+  onDelete,
+  onTodoUpdated,
+  prayerTimes,
+}: TodoTileProps) {
   const tileRef = useRef<HTMLDivElement>(null);
 
-  const handleToggleComplete = () => {
-    const updatedTodo = TodoService.toggleComplete(todo.id);
-    if (updatedTodo) {
-      onUpdate(updatedTodo);
+  const handleToggleComplete = async () => {
+    try {
+      const updatedTodo = await TodoService.toggleComplete(todo.id);
+      if (updatedTodo) {
+        onUpdate(updatedTodo);
+      }
+    } catch (error) {
+      console.error("Error toggling todo completion:", error);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Failed to update todo. Please try again.");
+      }
     }
   };
 
-  const handleMarkAsMissed = () => {
-    const updatedTodo = TodoService.markAsMissed(todo.id);
-    if (updatedTodo) {
-      onUpdate(updatedTodo);
+  const handleMarkAsMissed = async () => {
+    try {
+      const updatedTodo = await TodoService.markAsMissed(todo.id);
+      if (updatedTodo) {
+        onUpdate(updatedTodo);
+      }
+    } catch (error) {
+      console.error("Error marking todo as missed:", error);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Failed to update todo. Please try again.");
+      }
     }
   };
 
-  const handleArchive = () => {
-    const updatedTodo = TodoService.archiveTodo(todo.id);
-    if (updatedTodo) {
-      onUpdate(updatedTodo);
+  const handleArchive = async () => {
+    try {
+      const updatedTodo = await TodoService.archiveTodo(todo.id);
+      if (updatedTodo) {
+        onUpdate(updatedTodo);
+      }
+    } catch (error) {
+      console.error("Error archiving todo:", error);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Failed to archive todo. Please try again.");
+      }
     }
   };
 
-  const handleDelete = () => {
-    TodoService.deleteTodo(todo.id);
-    onDelete(todo.id);
+  const handleDelete = async () => {
+    try {
+      const success = await TodoService.deleteTodo(todo.id);
+      if (success) {
+        onDelete(todo.id);
+      }
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Failed to delete todo. Please try again.");
+      }
+    }
   };
 
-  const getDisplayTime = (todo: Todo) => {
+  const getDisplayTime = (userTodo: UserTodo) => {
+    const todo = userTodo.todo;
     // For prayer todos, use actual prayer times
     if (todo.category === "prayer" && prayerTimes) {
       const prayerTimeMap: { [key: string]: string } = {
@@ -80,7 +127,8 @@ function TodoTile({ todo, onUpdate, onDelete, prayerTimes }: TodoTileProps) {
     return formatTimeForDisplay(todo.time);
   };
 
-  const getTimeStatus = (todo: Todo) => {
+  const getTimeStatus = (userTodo: UserTodo) => {
+    const todo = userTodo.todo;
     let timeToCheck = todo.time;
 
     // For prayer todos, use actual prayer times
@@ -110,7 +158,8 @@ function TodoTile({ todo, onUpdate, onDelete, prayerTimes }: TodoTileProps) {
     return "normal";
   };
 
-  const getTimeRemaining = (todo: Todo) => {
+  const getTimeRemaining = (userTodo: UserTodo) => {
+    const todo = userTodo.todo;
     let timeToCheck = todo.time;
 
     // For prayer todos, use actual prayer times
@@ -199,17 +248,17 @@ function TodoTile({ todo, onUpdate, onDelete, prayerTimes }: TodoTileProps) {
                     todo.missed && "text-red-600"
                   )}
                 >
-                  {getCategoryIcon(todo.category)} {todo.title}
+                  {getCategoryIcon(todo.todo.category)} {todo.todo.title}
                 </h3>
-                {todo.description && (
+                {todo.todo.description && (
                   <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                    {todo.description}
+                    {todo.todo.description}
                   </p>
                 )}
               </div>
 
               {/* Time */}
-              {todo.time && (
+              {todo.todo.time && (
                 <div
                   className={cn(
                     "flex items-center gap-1 text-xs flex-shrink-0",
@@ -243,10 +292,11 @@ function TodoTile({ todo, onUpdate, onDelete, prayerTimes }: TodoTileProps) {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => {}}>
-                <Edit className="mr-2 h-4 w-4" />
-                Update
-              </DropdownMenuItem>
+              {todo.todo.type !== "suggested" && (
+                <DropdownMenuItem asChild>
+                  <UpdateTodoDrawer todo={todo} onTodoUpdated={onTodoUpdated} />
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={handleArchive}>
                 <Archive className="mr-2 h-4 w-4" />
                 Archive

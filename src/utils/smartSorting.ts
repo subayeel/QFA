@@ -1,4 +1,4 @@
-import { Todo } from "@/types/todo";
+import { UserTodo } from "@/types/todos.types";
 import { timeToMinutes } from "./prayerTimes";
 
 export interface SmartSortingContext {
@@ -36,9 +36,10 @@ const getTimeOfDay = (
 
 // Calculate time priority for a todo based on current context
 const calculateTimePriority = (
-  todo: Todo,
+  userTodo: UserTodo,
   context: SmartSortingContext
 ): number => {
+  const todo = userTodo.todo;
   const { currentTime, prayerTimes, currentPrayer } = context;
   const timeOfDay = getTimeOfDay(currentTime);
   const currentHour = currentTime.getHours();
@@ -167,9 +168,9 @@ const calculateTimePriority = (
 
 // Smart sorting function
 export const smartSortTodos = (
-  todos: Todo[],
+  userTodos: UserTodo[],
   context?: SmartSortingContext
-): Todo[] => {
+): UserTodo[] => {
   const currentContext: SmartSortingContext = context || {
     currentTime: new Date(),
     prayerTimes: DEFAULT_PRAYER_TIMES,
@@ -186,16 +187,22 @@ export const smartSortTodos = (
     }
   }
 
-  // Calculate time priority for each todo
-  const todosWithPriority = todos.map((todo) => ({
-    ...todo,
-    timePriority: calculateTimePriority(todo, currentContext),
+  // Calculate time priority for each todo and update the todo definition
+  const userTodosWithPriority = userTodos.map((userTodo) => ({
+    ...userTodo,
+    todo: {
+      ...userTodo.todo,
+      timePriority: calculateTimePriority(userTodo, currentContext),
+    },
   }));
 
   // Sort by time priority (highest first), then by creation time
-  return todosWithPriority.sort((a, b) => {
-    if (a.timePriority !== b.timePriority) {
-      return (b.timePriority || 0) - (a.timePriority || 0);
+  return userTodosWithPriority.sort((a, b) => {
+    const aPriority = a.todo.timePriority || 0;
+    const bPriority = b.todo.timePriority || 0;
+
+    if (aPriority !== bPriority) {
+      return bPriority - aPriority;
     }
     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   });

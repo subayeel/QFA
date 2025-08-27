@@ -77,7 +77,7 @@ export const salahCourse: CourseDetailsType = {
 
 export const imaanCourse: CourseDetailsType = {
   id: "IMAAN",
-  name: "Imaan Booster",
+  name: "Faith",
   description: "Understand Imaan and how to develop it",
   color: "#F1DFDC",
   lessons: [

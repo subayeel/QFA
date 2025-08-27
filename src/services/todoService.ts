@@ -1,14 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Todo,
+  UserTodo,
   CreateTodoData,
+  UpdateTodoData,
   TodoFilter,
   TodoStats,
 } from "@/types/todos.types";
-import {
-  getTodaysSuggestedTodos,
-  getUpcomingSuggestedTodos,
-  SuggestedTodo,
-} from "@/utils/suggestedTodos";
+import { SuggestedTodo } from "@/types/todos.types";
 import {
   smartSortTodos,
   getCurrentPrayerContext,
@@ -16,245 +15,430 @@ import {
 } from "@/utils/smartSorting";
 import { PrayerTimes } from "@/utils/prayerTimes";
 
-const TODO_STORAGE_KEY = "quranforall_todos";
-
 export class TodoService {
-  private static getTodosFromStorage(): Todo[] {
-    try {
-      const stored = localStorage.getItem(TODO_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-      console.error("Error reading todos from localStorage:", error);
-      return [];
-    }
+  // Helper function to convert database UserTodo to UserTodo interface
+  private static convertDbUserTodoToUserTodo(dbUserTodo: any): UserTodo {
+    return {
+      id: dbUserTodo.id,
+      date:
+        typeof dbUserTodo.date === "string"
+          ? dbUserTodo.date
+          : dbUserTodo.date.toISOString(),
+      completed: dbUserTodo.completed,
+      missed: dbUserTodo.missed,
+      archived: dbUserTodo.archived,
+      todo: {
+        id: dbUserTodo.todo.id,
+        title: dbUserTodo.todo.title,
+        description: dbUserTodo.todo.description || undefined,
+        time: dbUserTodo.todo.time || undefined,
+        category:
+          (dbUserTodo.todo.category as
+            | "prayer"
+            | "quran"
+            | "dhikr"
+            | "charity"
+            | "learning"
+            | "personal") || undefined,
+        priority: dbUserTodo.todo.priority as "high" | "medium" | "low",
+        timePriority: dbUserTodo.todo.timePriority || undefined,
+        type: dbUserTodo.todo.type as "custom" | "suggested",
+        createdAt:
+          typeof dbUserTodo.todo.createdAt === "string"
+            ? dbUserTodo.todo.createdAt
+            : dbUserTodo.todo.createdAt.toISOString(),
+        updatedAt:
+          typeof dbUserTodo.todo.updatedAt === "string"
+            ? dbUserTodo.todo.updatedAt
+            : dbUserTodo.todo.updatedAt.toISOString(),
+      },
+      createdAt:
+        typeof dbUserTodo.createdAt === "string"
+          ? dbUserTodo.createdAt
+          : dbUserTodo.createdAt.toISOString(),
+      updatedAt:
+        typeof dbUserTodo.updatedAt === "string"
+          ? dbUserTodo.updatedAt
+          : dbUserTodo.updatedAt.toISOString(),
+    };
   }
 
-  private static saveTodosToStorage(todos: Todo[]): void {
+  // Helper function to check if user is authenticated
+  private static async checkAuthentication(): Promise<boolean> {
     try {
-      localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos));
+      const response = await fetch("/api/todos/check-auth");
+      if (response.ok) {
+        const data = await response.json();
+        return data.authenticated;
+      }
     } catch (error) {
-      console.error("Error saving todos to localStorage:", error);
+      console.error("Error checking authentication:", error);
     }
+    return false;
   }
 
-  static async getAllTodos(): Promise<Todo[]> {
-    const todos = this.getTodosFromStorage();
-    const context = await getCurrentPrayerContext();
-    return smartSortTodos(todos, context);
+  // Helper function to handle API errors
+  private static handleApiError(error: any, operation: string): never {
+    console.error(`Error in ${operation}:`, error);
+    throw new Error(`Failed to ${operation}. Please try again.`);
+  }
+
+  static async getAllTodos(): Promise<UserTodo[]> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to fetch todos");
+    }
+
+    try {
+      const response = await fetch("/api/todos");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const dbUserTodos = await response.json();
+      return dbUserTodos.map(this.convertDbUserTodoToUserTodo);
+    } catch (error) {
+      this.handleApiError(error, "fetch all todos");
+    }
   }
 
   static async getTodosByFilter(
     filter: TodoFilter,
     prayerTimes?: PrayerTimes
-  ): Promise<Todo[]> {
-    const todos = this.getTodosFromStorage();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const dayAfterTomorrow = new Date(today);
-    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-
-    let filteredTodos: Todo[];
-
-    switch (filter) {
-      case "today":
-        filteredTodos = todos.filter((todo) => {
-          const todoDate = new Date(todo.date);
-          todoDate.setHours(0, 0, 0, 0);
-          return todoDate.getTime() === today.getTime() && !todo.archived;
-        });
-        break;
-
-      case "upcoming":
-        filteredTodos = todos.filter((todo) => {
-          const todoDate = new Date(todo.date);
-          todoDate.setHours(0, 0, 0, 0);
-          return (
-            todoDate >= tomorrow &&
-            todoDate <= dayAfterTomorrow &&
-            !todo.archived
-          );
-        });
-        break;
-
-      case "archived":
-        filteredTodos = todos.filter((todo) => todo.archived);
-        break;
-
-      default:
-        filteredTodos = todos;
+  ): Promise<UserTodo[]> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to fetch todos");
     }
 
-    // Apply smart sorting for non-archived todos
-    if (filter !== "archived") {
-      const context = prayerTimes
-        ? getCurrentPrayerContextWithTimes(prayerTimes)
-        : await getCurrentPrayerContext();
-      return smartSortTodos(filteredTodos, context);
-    }
+    try {
+      const response = await fetch(`/api/todos?filter=${filter}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    return filteredTodos;
-  }
-
-  static createTodo(todoData: CreateTodoData): Todo {
-    const todos = this.getTodosFromStorage();
-    const newTodo: Todo = {
-      id: `todo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      ...todoData,
-      completed: false,
-      missed: false,
-      archived: false,
-      type: "custom",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    todos.push(newTodo);
-    this.saveTodosToStorage(todos);
-    return newTodo;
-  }
-
-  static updateTodo(id: string, updates: Partial<Todo>): Todo | null {
-    const todos = this.getTodosFromStorage();
-    const index = todos.findIndex((todo) => todo.id === id);
-
-    if (index === -1) return null;
-
-    todos[index] = {
-      ...todos[index],
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    };
-
-    this.saveTodosToStorage(todos);
-    return todos[index];
-  }
-
-  static deleteTodo(id: string): boolean {
-    const todos = this.getTodosFromStorage();
-    const filteredTodos = todos.filter((todo) => todo.id !== id);
-
-    if (filteredTodos.length === todos.length) return false;
-
-    this.saveTodosToStorage(filteredTodos);
-    return true;
-  }
-
-  static toggleComplete(id: string): Todo | null {
-    const todos = this.getTodosFromStorage();
-    const index = todos.findIndex((todo) => todo.id === id);
-
-    if (index === -1) return null;
-
-    todos[index] = {
-      ...todos[index],
-      completed: !todos[index].completed,
-      missed: false, // Reset missed when completing
-      updatedAt: new Date().toISOString(),
-    };
-
-    this.saveTodosToStorage(todos);
-    return todos[index];
-  }
-
-  static markAsMissed(id: string): Todo | null {
-    const todos = this.getTodosFromStorage();
-    const index = todos.findIndex((todo) => todo.id === id);
-
-    if (index === -1) return null;
-
-    todos[index] = {
-      ...todos[index],
-      missed: true,
-      completed: false,
-      updatedAt: new Date().toISOString(),
-    };
-
-    this.saveTodosToStorage(todos);
-    return todos[index];
-  }
-
-  static archiveTodo(id: string): Todo | null {
-    const todos = this.getTodosFromStorage();
-    const index = todos.findIndex((todo) => todo.id === id);
-
-    if (index === -1) return null;
-
-    todos[index] = {
-      ...todos[index],
-      archived: true,
-      updatedAt: new Date().toISOString(),
-    };
-
-    this.saveTodosToStorage(todos);
-    return todos[index];
-  }
-
-  static getStats(): TodoStats {
-    const todos = this.getTodosFromStorage();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const todayTodos = todos.filter((todo) => {
-      const todoDate = new Date(todo.date);
-      todoDate.setHours(0, 0, 0, 0);
-      return todoDate.getTime() === today.getTime() && !todo.archived;
-    });
-
-    return {
-      total: todayTodos.length,
-      completed: todayTodos.filter((todo) => todo.completed).length,
-      missed: todayTodos.filter((todo) => todo.missed).length,
-      pending: todayTodos.filter((todo) => !todo.completed && !todo.missed)
-        .length,
-    };
-  }
-
-  static async initializeSuggestedTodos(): Promise<void> {
-    const todos = this.getTodosFromStorage();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // Check if we already have today's suggested todos
-    const hasTodaySuggested = todos.some((todo) => {
-      const todoDate = new Date(todo.date);
-      todoDate.setHours(0, 0, 0, 0);
-      return (
-        todoDate.getTime() === today.getTime() && todo.type === "suggested"
+      const dbUserTodos = await response.json();
+      const convertedUserTodos = dbUserTodos.map(
+        this.convertDbUserTodoToUserTodo
       );
-    });
 
-    if (!hasTodaySuggested) {
-      const suggestedTodos = getTodaysSuggestedTodos();
+      // Apply smart sorting for non-archived todos
+      if (filter !== "archived") {
+        const context = prayerTimes
+          ? await getCurrentPrayerContextWithTimes(prayerTimes)
+          : await getCurrentPrayerContext();
+        return smartSortTodos(convertedUserTodos, context);
+      }
 
-      suggestedTodos.forEach((suggested) => {
-        const newTodo: Todo = {
-          id: `suggested_${suggested.id}_${Date.now()}`,
-          title: suggested.title,
-          description: suggested.description,
-          time: suggested.time,
-          date: today.toISOString(),
-          completed: false,
-          missed: false,
-          archived: false,
-          type: "suggested",
-          category: suggested.category,
-          priority: suggested.priority,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+      return convertedUserTodos;
+    } catch (error) {
+      this.handleApiError(error, "fetch todos by filter");
+    }
+  }
 
-        todos.push(newTodo);
+  static async createTodo(todoData: CreateTodoData): Promise<UserTodo> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to create todos");
+    }
+
+    try {
+      const response = await fetch("/api/todos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(todoData),
       });
 
-      this.saveTodosToStorage(todos);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const dbUserTodo = await response.json();
+      return this.convertDbUserTodoToUserTodo(dbUserTodo);
+    } catch (error) {
+      this.handleApiError(error, "create todo");
     }
   }
 
-  static getUpcomingSuggestedTodos(): SuggestedTodo[] {
-    return getUpcomingSuggestedTodos();
+  static async updateTodo(
+    id: string,
+    updates: UpdateTodoData
+  ): Promise<UserTodo | null> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to update todos");
+    }
+
+    try {
+      const response = await fetch(`/api/todos/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Todo not found
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const dbUserTodo = await response.json();
+      return this.convertDbUserTodoToUserTodo(dbUserTodo);
+    } catch (error) {
+      this.handleApiError(error, "update todo");
+    }
+  }
+
+  static async deleteTodo(id: string): Promise<boolean> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to delete todos");
+    }
+
+    try {
+      const response = await fetch(`/api/todos/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return false; // Todo not found
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return true;
+    } catch (error) {
+      this.handleApiError(error, "delete todo");
+    }
+  }
+
+  static async toggleComplete(id: string): Promise<UserTodo | null> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to update todos");
+    }
+
+    try {
+      const response = await fetch(`/api/todos/${id}/actions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "toggle_complete" }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Todo not found
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const dbUserTodo = await response.json();
+      return this.convertDbUserTodoToUserTodo(dbUserTodo);
+    } catch (error) {
+      this.handleApiError(error, "toggle todo completion");
+    }
+  }
+
+  static async markAsMissed(id: string): Promise<UserTodo | null> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to update todos");
+    }
+
+    try {
+      const response = await fetch(`/api/todos/${id}/actions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "mark_missed" }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Todo not found
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const dbUserTodo = await response.json();
+      return this.convertDbUserTodoToUserTodo(dbUserTodo);
+    } catch (error) {
+      this.handleApiError(error, "mark todo as missed");
+    }
+  }
+
+  static async archiveTodo(id: string): Promise<UserTodo | null> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to update todos");
+    }
+
+    try {
+      const response = await fetch(`/api/todos/${id}/actions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "archive" }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Todo not found
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const dbUserTodo = await response.json();
+      return this.convertDbUserTodoToUserTodo(dbUserTodo);
+    } catch (error) {
+      this.handleApiError(error, "archive todo");
+    }
+  }
+
+  static async unarchiveTodo(id: string): Promise<UserTodo | null> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to update todos");
+    }
+
+    try {
+      const response = await fetch(`/api/todos/${id}/actions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "unarchive" }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Todo not found
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const dbUserTodo = await response.json();
+      return this.convertDbUserTodoToUserTodo(dbUserTodo);
+    } catch (error) {
+      this.handleApiError(error, "unarchive todo");
+    }
+  }
+
+  static async getStats(): Promise<TodoStats> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to fetch todo stats");
+    }
+
+    try {
+      const response = await fetch("/api/todos/stats");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      this.handleApiError(error, "fetch todo stats");
+    }
+  }
+
+  static async getSuggestedTodos(
+    date?: Date,
+    filter?: "today" | "upcoming"
+  ): Promise<UserTodo[]> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to fetch suggested todos");
+    }
+
+    try {
+      const params = new URLSearchParams();
+      if (date) {
+        params.append("date", date.toISOString());
+      }
+      if (filter) {
+        params.append("filter", filter);
+      }
+
+      const response = await fetch(`/api/todos/suggested?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const suggestedUserTodos = await response.json();
+      return suggestedUserTodos;
+    } catch (error) {
+      this.handleApiError(error, "fetch suggested todos");
+    }
+  }
+
+  static async getSuggestedTodosForDate(date: Date): Promise<UserTodo[]> {
+    return this.getSuggestedTodos(date, "today");
+  }
+
+  static async getUpcomingSuggestedTodos(): Promise<SuggestedTodo[]> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to fetch suggested todos");
+    }
+
+    try {
+      const response = await fetch("/api/todos/suggested?filter=upcoming");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const suggestedUserTodos = await response.json();
+      return suggestedUserTodos.map((userTodo: any) => userTodo.todo);
+    } catch (error) {
+      this.handleApiError(error, "fetch upcoming suggested todos");
+    }
+  }
+
+  static async getCombinedTodos(
+    filter: TodoFilter,
+    prayerTimes?: PrayerTimes
+  ): Promise<UserTodo[]> {
+    const isAuthenticated = await this.checkAuthentication();
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to fetch todos");
+    }
+
+    try {
+      // Get user todos
+      const userTodos = await this.getTodosByFilter(filter, prayerTimes);
+
+      // Get suggested todos based on filter
+      let suggestedTodos: UserTodo[] = [];
+      if (filter !== "archived") {
+        const today = new Date();
+        suggestedTodos = await this.getSuggestedTodos(today, filter);
+      }
+
+      // Combine user todos with suggested todos
+      const combinedTodos = [...suggestedTodos, ...userTodos];
+
+      // Apply smart sorting for non-archived todos
+      if (filter !== "archived") {
+        const context = prayerTimes
+          ? await getCurrentPrayerContextWithTimes(prayerTimes)
+          : await getCurrentPrayerContext();
+        return smartSortTodos(combinedTodos, context);
+      }
+
+      return combinedTodos;
+    } catch (error) {
+      this.handleApiError(error, "fetch combined todos");
+    }
   }
 }

@@ -90,14 +90,14 @@ export const calculatePrayerTimes = (
   const times = prayTime.times();
 
   return {
-    fajr: times.fajr,
-    sunrise: times.sunrise,
-    dhuhr: times.dhuhr,
-    asr: times.asr,
-    sunset: times.sunset,
-    maghrib: times.maghrib,
-    isha: times.isha,
-    midnight: times.midnight,
+    fajr: times.fajr.toString(),
+    sunrise: times.sunrise.toString(),
+    dhuhr: times.dhuhr.toString(),
+    asr: times.asr.toString(),
+    sunset: times.sunset.toString(),
+    maghrib: times.maghrib.toString(),
+    isha: times.isha.toString(),
+    midnight: times.midnight.toString(),
   };
 };
 

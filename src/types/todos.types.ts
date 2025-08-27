@@ -3,14 +3,21 @@ export interface Todo {
   title: string;
   description?: string;
   time?: string;
+  category?: "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal";
+  priority: "high" | "medium" | "low";
+  timePriority?: number; // For smart sorting based on current time
+  type: "custom" | "suggested";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserTodo {
+  id: string;
   date: string; // ISO date string
   completed: boolean;
   missed: boolean;
   archived: boolean;
-  type: "custom" | "suggested";
-  category?: "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal";
-  priority: "high" | "medium" | "low";
-  timePriority?: number; // For smart sorting based on current time
+  todo: Todo;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,7 +28,30 @@ export interface CreateTodoData {
   time?: string;
   date: string;
   category?: "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal";
+  priority?: "high" | "medium" | "low";
+}
+
+export interface UpdateTodoData {
+  title?: string;
+  description?: string;
+  time?: string;
+  category?: "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal";
+  priority?: "high" | "medium" | "low";
+  timePriority?: number;
+}
+
+export interface SuggestedTodo {
+  id: string;
+  title: string;
+  description?: string;
+  time?: string;
+  category: "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal";
   priority: "high" | "medium" | "low";
+  timePriority?: number;
+  frequency: "daily" | "weekly" | "monthly" | "custom";
+  customLogic?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type TodoFilter = "today" | "upcoming" | "archived";

@@ -4,6 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { SignOutButton } from "@/app/components/SignOutButton";
+import { prisma } from "@/lib/prisma";
+import { courses } from "@/utils/courses";
 import {
   Target,
   Heart,
@@ -31,23 +33,131 @@ export default async function UserProfilePage() {
     location: "Dubai, UAE",
   };
 
+  // Fetch course progress data
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      completedLessons: true,
+      completedTasks: true,
+    },
+  });
+
+  // Fetch today's todo statistics
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const todayTodos = await prisma.userTodo.findMany({
+    where: {
+      userId: session.user.id,
+      date: {
+        gte: today,
+        lt: tomorrow,
+      },
+      archived: false,
+    },
+    include: {
+      todo: true,
+    },
+  });
+
+  const todayStats = {
+    total: todayTodos.length,
+    completed: todayTodos.filter((todo) => todo.completed).length,
+    missed: todayTodos.filter((todo) => todo.missed).length,
+    pending: todayTodos.filter((todo) => !todo.completed && !todo.missed)
+      .length,
+  };
+
+  // Calculate category breakdown
+  const categoryStats = todayTodos.reduce((acc, userTodo) => {
+    const category = userTodo.todo.category || "personal";
+    if (!acc[category]) {
+      acc[category] = { total: 0, completed: 0, missed: 0 };
+    }
+    acc[category].total++;
+    if (userTodo.completed) acc[category].completed++;
+    if (userTodo.missed) acc[category].missed++;
+    return acc;
+  }, {} as Record<string, { total: number; completed: number; missed: number }>);
+
+  // Get recent todo activity (last 7 days)
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+
+  const recentTodos = await prisma.userTodo.findMany({
+    where: {
+      userId: session.user.id,
+      date: {
+        gte: weekAgo,
+      },
+      archived: false,
+    },
+    include: {
+      todo: true,
+    },
+    orderBy: {
+      date: "desc",
+    },
+    take: 5,
+  });
+
+  // Get overall todo statistics (all time)
+  const overallStats = await prisma.userTodo.groupBy({
+    by: ["completed", "missed", "archived"],
+    where: {
+      userId: session.user.id,
+    },
+    _count: {
+      id: true,
+    },
+  });
+
+  const overallTodoStats = {
+    total: overallStats.reduce((sum, stat) => sum + stat._count.id, 0),
+    completed:
+      overallStats.find(
+        (stat) => stat.completed && !stat.missed && !stat.archived
+      )?._count.id || 0,
+    missed:
+      overallStats.find(
+        (stat) => stat.missed && !stat.completed && !stat.archived
+      )?._count.id || 0,
+    archived: overallStats.find((stat) => stat.archived)?._count.id || 0,
+    pending:
+      overallStats.find(
+        (stat) => !stat.completed && !stat.missed && !stat.archived
+      )?._count.id || 0,
+  };
+
   const progressData = {
-    courses: [
-      { name: "Hifz Progress", progress: 75 },
-      { name: "Salah ", progress: 100 },
-      { name: "Zikr ", progress: 75 },
-      { name: "Arabic Grammar", progress: 45 },
-      { name: "Islamic History", progress: 60 },
-    ],
+    courses: Object.values(courses).map((course) => {
+      const courseCompletedLessons = [...new Set(user?.completedLessons)];
+      const totalLessons = course.lessons.length;
+      const completedLessons = courseCompletedLessons.length;
+      const progressPercentage =
+        totalLessons > 0
+          ? Math.round((completedLessons / totalLessons) * 100)
+          : 0;
+
+      return {
+        name: course.name,
+        progress: progressPercentage,
+      };
+    }),
     hifzProgress: {
       current: 15,
       total: 30,
       percentage: 50,
     },
     todayTodos: {
-      completed: 8,
-      total: 12,
-      percentage: 67,
+      completed: todayStats.completed,
+      total: todayStats.total,
+      percentage:
+        todayStats.total > 0
+          ? Math.round((todayStats.completed / todayStats.total) * 100)
+          : 0,
     },
   };
 
@@ -213,10 +323,171 @@ export default async function UserProfilePage() {
                 <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">
                   {progressData.todayTodos.percentage}% Complete
                 </p>
+
+                {/* Additional Todo Stats */}
+                {todayStats.total > 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="text-green-600">
+                        <div className="font-semibold">
+                          {todayStats.completed}
+                        </div>
+                        <div>Completed</div>
+                      </div>
+                      <div className="text-red-600">
+                        <div className="font-semibold">{todayStats.missed}</div>
+                        <div>Missed</div>
+                      </div>
+                      <div className="text-yellow-600">
+                        <div className="font-semibold">
+                          {todayStats.pending}
+                        </div>
+                        <div>Pending</div>
+                      </div>
+                      <div className="text-gray-600">
+                        <div className="font-semibold">{todayStats.total}</div>
+                        <div>Total</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
         </div>
+
+        {/* Todo Summary */}
+        <div className="mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            Todo Summary
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <Card className="p-4 bg-white/80 backdrop-blur-sm border shadow-none">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  {overallTodoStats.completed}
+                </div>
+                <div className="text-sm text-gray-600">Completed</div>
+              </div>
+            </Card>
+            <Card className="p-4 bg-white/80 backdrop-blur-sm border shadow-none">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600">
+                  {overallTodoStats.missed}
+                </div>
+                <div className="text-sm text-gray-600">Missed</div>
+              </div>
+            </Card>
+            <Card className="p-4 bg-white/80 backdrop-blur-sm border shadow-none">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-yellow-600">
+                  {overallTodoStats.pending}
+                </div>
+                <div className="text-sm text-gray-600">Pending</div>
+              </div>
+            </Card>
+            <Card className="p-4 bg-white/80 backdrop-blur-sm border shadow-none">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-600">
+                  {overallTodoStats.archived}
+                </div>
+                <div className="text-sm text-gray-600">Archived</div>
+              </div>
+            </Card>
+          </div>
+        </div>
+
+        {/* Todo Analytics */}
+        {todayStats.total > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              Today&apos;s Analytics
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Category Breakdown */}
+              <Card className="p-6 sm:p-8 bg-white/80 backdrop-blur-sm border shadow-none">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+                  Today by Category
+                </h3>
+                <div className="space-y-3">
+                  {Object.entries(categoryStats).map(([category, stats]) => (
+                    <div
+                      key={category}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-700 capitalize">
+                          {category}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          {stats.total}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-green-600">
+                          {stats.completed}✓
+                        </span>
+                        <span className="text-red-600">{stats.missed}✗</span>
+                        <span className="text-yellow-600">
+                          {stats.total - stats.completed - stats.missed}⏳
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              {/* Recent Activity */}
+              <Card className="p-6 sm:p-8 bg-white/80 backdrop-blur-sm border shadow-none">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+                  Recent Activity
+                </h3>
+                <div className="space-y-3">
+                  {recentTodos.map((userTodo) => (
+                    <div
+                      key={userTodo.id}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {userTodo.todo.title}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(userTodo.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={
+                            userTodo.completed
+                              ? "default"
+                              : userTodo.missed
+                              ? "destructive"
+                              : "secondary"
+                          }
+                          className="text-xs"
+                        >
+                          {userTodo.completed
+                            ? "Completed"
+                            : userTodo.missed
+                            ? "Missed"
+                            : "Pending"}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  {recentTodos.length === 0 && (
+                    <p className="text-sm text-gray-500 text-center py-4">
+                      No recent activity
+                    </p>
+                  )}
+                </div>
+              </Card>
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div>

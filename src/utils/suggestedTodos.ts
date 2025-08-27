@@ -1,16 +1,53 @@
-export interface SuggestedTodo {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { SuggestedTodo } from "@/types/todos.types";
+
+// Legacy interface for backward compatibility
+export interface LegacySuggestedTodo {
   id: string;
   title: string;
   description: string;
   type: "daily" | "weekly" | "monthly";
   category: "prayer" | "quran" | "dhikr" | "charity" | "learning";
   time?: string;
-  dayOfWeek?: number; // 0 = Sunday, 1 = Monday, etc.
+  dayOfWeek?: number;
   reference?: string;
   priority: "high" | "medium" | "low";
 }
 
-export const suggestedTodos: SuggestedTodo[] = [
+// Function to fetch suggested todos from database API
+export const getTodaysSuggestedTodos = async (): Promise<SuggestedTodo[]> => {
+  try {
+    const response = await fetch("/api/todos/suggested");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const userTodos = await response.json();
+    return userTodos.map((userTodo: any) => userTodo.todo);
+  } catch (error) {
+    console.error("Error fetching suggested todos:", error);
+    return [];
+  }
+};
+
+// Function to fetch upcoming suggested todos from database API
+export const getUpcomingSuggestedTodos = async (): Promise<SuggestedTodo[]> => {
+  try {
+    const response = await fetch("/api/todos/suggested?filter=upcoming");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const userTodos = await response.json();
+    return userTodos.map((userTodo: any) => userTodo.todo);
+  } catch (error) {
+    console.error("Error fetching upcoming suggested todos:", error);
+    return [];
+  }
+};
+
+// Legacy static data (kept for reference, not used anymore)
+export const suggestedTodos: LegacySuggestedTodo[] = [
   // Daily Prayers
   {
     id: "fajr-prayer",
@@ -189,7 +226,8 @@ export const suggestedTodos: SuggestedTodo[] = [
   },
 ];
 
-export const getTodaysSuggestedTodos = (): SuggestedTodo[] => {
+// Legacy functions (kept for backward compatibility, but now use database)
+export const getTodaysSuggestedTodosLegacy = (): LegacySuggestedTodo[] => {
   const today = new Date();
   const dayOfWeek = today.getDay();
 
@@ -201,7 +239,7 @@ export const getTodaysSuggestedTodos = (): SuggestedTodo[] => {
   });
 };
 
-export const getUpcomingSuggestedTodos = (): SuggestedTodo[] => {
+export const getUpcomingSuggestedTodosLegacy = (): LegacySuggestedTodo[] => {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
