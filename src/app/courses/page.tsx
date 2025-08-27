@@ -101,6 +101,8 @@ function CoursesLayout() {
                     src={course.image}
                     alt={course.name}
                     className="object-contain absolute bottom-2 right-4 h-20 sm:h-32 md:h-24 lg:h-32"
+                    width={100}
+                    height={120}
                   />
                 </Card>
               </Link>

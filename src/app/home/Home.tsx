@@ -406,6 +406,8 @@ function Home() {
                         src={"/salah-icon.png"}
                         className="object-contain h-24"
                         alt="salah"
+                        width={100}
+                        height={100}
                       />
                     </div>
                   </div>
@@ -458,6 +460,8 @@ function Home() {
                         src={"/home-quran.png"}
                         className="object-contain h-16 sm:h-24"
                         alt="quran"
+                        width={100}
+                        height={100}
                       />
                     </div>
                   </div>
@@ -507,6 +511,8 @@ function Home() {
                   src={"/salah-icon.png"}
                   className="object-contain h-20"
                   alt="salah"
+                  width={100}
+                  height={100}
                 />
               </div>
             </div>
@@ -553,6 +559,8 @@ function Home() {
                   src="/home-quran.png"
                   className="object-contain h-16"
                   alt="quran"
+                  width={250}
+                  height={250}
                 />
               </div>
             </div>
@@ -644,6 +652,8 @@ function Home() {
                 src={"/home-mosque.png"}
                 alt="mosque"
                 className="object-contain h-28 sm:h-40 lg:h-48"
+                width={150}
+                height={250}
               />
             </div>
           </Card>
@@ -662,6 +672,8 @@ function Home() {
                         ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[160deg]"
                         : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
                     }`}
+                    width={20}
+                    height={20}
                   />
                 </div>
                 <p className={`text-sm text-gray-500 lg:text-base`}>
@@ -681,6 +693,8 @@ function Home() {
                         ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[240deg]"
                         : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
                     }`}
+                    width={20}
+                    height={20}
                   />
                 </div>
                 <p className={`text-sm text-gray-500 lg:text-base`}>
@@ -700,6 +714,8 @@ function Home() {
                         ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[160deg]"
                         : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
                     }`}
+                    width={20}
+                    height={20}
                   />
                 </div>
                 <p className={`text-sm text-gray-500 lg:text-base`}>
@@ -719,6 +735,8 @@ function Home() {
                         ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[160deg]"
                         : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
                     }`}
+                    width={20}
+                    height={20}
                   />
                 </div>
                 <p className={`text-sm text-gray-500 lg:text-base`}>
@@ -738,6 +756,8 @@ function Home() {
                         ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[160deg]"
                         : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
                     }`}
+                    width={20}
+                    height={20}
                   />
                 </div>
                 <p className={`text-sm text-gray-500 lg:text-base`}>
@@ -873,134 +893,6 @@ function Home() {
           </div>
         </div>
       )}
-
-      {/* Learning Access */}
-      <div className="px-6 py-8 lg:px-8 lg:py-12">
-        <div className="flex gap-2 items-center pb-6 lg:pb-8">
-          <p className="text-xl text-black font-medium lg:text-2xl">
-            Learning Access
-          </p>
-          <ChevronRight size={20} className="lg:w-6 lg:h-6" />
-        </div>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 lg:gap-6 lg:max-w-7xl lg:mx-auto">
-          <Card className="p-3 shadow-none bg-[#F1DFDD] relative cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 active:shadow-inner lg:p-6 lg:h-[200px]">
-            <div className="flex items-center gap-2">
-              <p className="text-3xl font-semibold tracking-wide text-black/80 lg:text-4xl">
-                Faith
-              </p>
-            </div>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              12 Lessons
-            </p>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              {" "}
-              15min / lesson
-            </p>
-            <Image
-              src={"/imaan-icon.png"}
-              alt="imaan"
-              className="object-contain absolute bottom-2 right-4 h-20 sm:h-32 lg:h-28 lg:bottom-4 lg:right-6"
-            />
-          </Card>
-          <Card className="bg-white p-3 shadow-none bg-[#F1E6C1] relative cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 active:shadow-inner lg:p-6 lg:h-[200px]">
-            <div className="flex items-center gap-2">
-              <p className="text-3xl font-semibold tracking-wider text-black/80 lg:text-4xl">
-                Salah
-              </p>
-            </div>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              8 Lessons
-            </p>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              {" "}
-              15min / lesson
-            </p>
-            <Image
-              src={"/salah-icon.png"}
-              alt="history"
-              className="object-contain absolute bottom-0 right-0 h-32 lg:h-36 lg:bottom-2 lg:right-2"
-            />
-          </Card>
-          <Card className="bg-white p-3 shadow-none bg-[#EFF2DF] relative cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 active:shadow-inner lg:p-6 lg:h-[200px]">
-            <div className="flex items-center gap-2">
-              <p className="text-3xl font-semibold tracking-wider text-black/80 lg:text-4xl">
-                History
-              </p>
-            </div>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              12 Lessons
-            </p>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              {" "}
-              15min / lesson
-            </p>
-            <Image
-              src={"/history-icon.png"}
-              alt="history"
-              className="object-contain absolute bottom-4 right-4 h-20 sm:h-32 lg:h-28 lg:bottom-6 lg:right-6"
-            />
-          </Card>
-          <Card className="bg-white p-3 shadow-none bg-[#C2DAEF] relative cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 active:shadow-inner lg:p-6 lg:h-[200px]">
-            <div className="flex items-center gap-2">
-              <p className="text-3xl font-semibold tracking-wider text-black/80 lg:text-4xl">
-                Miracles
-              </p>
-            </div>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              12 Lessons
-            </p>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              {" "}
-              15min / lesson
-            </p>
-            <Image
-              src={"/miracles-icon.png"}
-              alt="history"
-              className="object-contain absolute bottom-0 right-0 h-24 lg:h-28 lg:bottom-2 lg:right-2"
-            />
-          </Card>
-
-          <Card className="bg-white p-3 shadow-none bg-[#C8B7F6] relative overflow-hidden cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 active:shadow-inner lg:p-6 lg:h-[200px]">
-            <div className="flex items-center gap-2">
-              <p className="text-3xl font-semibold tracking-wider text-black/80 lg:text-4xl">
-                Ethics
-              </p>
-            </div>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              7 Lessons
-            </p>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              {" "}
-              10min / lesson
-            </p>
-            <Image
-              src={"/ethics-icon.png"}
-              alt="history"
-              className="object-contain absolute bottom-2 right-2 h-24 lg:h-28 lg:bottom-4 lg:right-4"
-            />
-          </Card>
-
-          <Card className="bg-white p-3 shadow-none bg-amber-100 relative overflow-hidden cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 active:shadow-inner lg:p-6 lg:h-[200px]">
-            <div className="flex items-center gap-2">
-              <p className="text-3xl font-semibold tracking-wider text-black/80 lg:text-4xl">
-                Arabic
-              </p>
-            </div>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              7 Lessons
-            </p>
-            <p className="text-sm text-black/50 font-medium lg:text-base">
-              {" "}
-              10min / lesson
-            </p>
-            <Image
-              src={"/arabic-icon.png"}
-              alt="arabic"
-              className="object-contain absolute bottom-0 right-0 h-24 lg:h-28 lg:bottom-2 lg:right-2"
-            />
-          </Card>
-        </div>
-      </div>
     </div>
   );
 }

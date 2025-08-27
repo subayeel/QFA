@@ -67,14 +67,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="pb-[80px]">
-      <body className={`${outfit.variable} antialiased`}>
+    <html lang="en">
+      <body className={`${outfit.variable} antialiased pb-[80px]`}>
         <SessionProvider>{children}</SessionProvider>
         <Toaster />
+        <footer className="fixed bottom-4 left-1/2 transform -translate-x-1/2  w-full px-6 max-w-[300px]">
+          <Dock />
+        </footer>
       </body>
-      <footer className="fixed bottom-4 left-1/2 transform -translate-x-1/2  w-full px-6 max-w-[300px]">
-        <Dock />
-      </footer>
     </html>
   );
 }
