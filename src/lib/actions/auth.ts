@@ -2,7 +2,7 @@
 
 import { signIn, signOut } from "@/auth";
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
 
 const prisma = new PrismaClient();

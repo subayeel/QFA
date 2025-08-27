@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["github.com", "avatars.githubusercontent.com"],
   },
+  serverExternalPackages: ["bcrypt"],
 };
 
 export default nextConfig;
