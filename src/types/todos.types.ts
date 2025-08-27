@@ -7,6 +7,9 @@ export interface Todo {
   priority: "high" | "medium" | "low";
   timePriority?: number; // For smart sorting based on current time
   type: "custom" | "suggested";
+  scope: "USER" | "ADMIN";
+  frequency?: "daily" | "weekly" | "monthly" | "custom";
+  customLogic?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,20 +41,6 @@ export interface UpdateTodoData {
   category?: "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal";
   priority?: "high" | "medium" | "low";
   timePriority?: number;
-}
-
-export interface SuggestedTodo {
-  id: string;
-  title: string;
-  description?: string;
-  time?: string;
-  category: "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal";
-  priority: "high" | "medium" | "low";
-  timePriority?: number;
-  frequency: "daily" | "weekly" | "monthly" | "custom";
-  customLogic?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export type TodoFilter = "today" | "upcoming" | "archived";

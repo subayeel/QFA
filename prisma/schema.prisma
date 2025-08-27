@@ -93,6 +93,13 @@ model Todo {
   priority    String   @default("medium") // "high" | "medium" | "low"
   timePriority Int?
   type        String   @default("custom") // "custom" or "suggested"
+  scope       Scope    @default(USER) // "USER" or "ADMIN"
+  
+  // When this todo should be suggested (e.g., "daily", "weekly", "monthly")
+  frequency   String?  // "daily", "weekly", "monthly", "custom"
+  
+  // For custom frequency, store the logic (e.g., "prayer_times", "hijri_date")
+  customLogic String?
   
   // Relationships
   userTodos   UserTodo[]
@@ -102,6 +109,8 @@ model Todo {
 
   @@index([type])
   @@index([category])
+  @@index([scope])
+  @@index([frequency])
 }
 
 // User-specific todo instances with tracking
@@ -128,26 +137,8 @@ model UserTodo {
   @@index([todoId])
 }
 
-// Predefined suggested todos
-model SuggestedTodo {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  time        String?
-  category    String   // "prayer" | "quran" | "dhikr" | "charity" | "learning" | "personal"
-  priority    String   @default("medium") // "high" | "medium" | "low"
-  timePriority Int?
-  
-  // When this todo should be suggested (e.g., "daily", "weekly", "monthly")
-  frequency   String   @default("daily") // "daily", "weekly", "monthly", "custom"
-  
-  // For custom frequency, store the logic (e.g., "prayer_times", "hijri_date")
-  customLogic String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([category])
-  @@index([frequency])
+enum Scope {
+  USER
+  ADMIN
 }
 

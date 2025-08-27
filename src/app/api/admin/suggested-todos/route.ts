@@ -16,7 +16,11 @@ export async function GET() {
     // TODO: Add admin role check here
     // For now, allow any authenticated user to access
 
-    const suggestedTodos = await prisma.suggestedTodo.findMany({
+    const suggestedTodos = await prisma.todo.findMany({
+      where: {
+        type: "suggested",
+        scope: "ADMIN",
+      },
       orderBy: [
         { frequency: "asc" },
         { timePriority: "asc" },
@@ -48,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const suggestedTodo = await prisma.suggestedTodo.create({
+    const suggestedTodo = await prisma.todo.create({
       data: {
         id: body.id,
         title: body.title,
@@ -57,6 +61,8 @@ export async function POST(request: NextRequest) {
         category: body.category,
         priority: body.priority,
         timePriority: body.timePriority,
+        type: "suggested",
+        scope: "ADMIN",
         frequency: body.frequency,
         customLogic: body.customLogic,
       },

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SuggestedTodo } from "@/types/todos.types";
+import { Todo } from "@/types/todos.types";
 
 // Legacy interface for backward compatibility
 export interface LegacySuggestedTodo {
@@ -15,7 +15,7 @@ export interface LegacySuggestedTodo {
 }
 
 // Function to fetch suggested todos from database API
-export const getTodaysSuggestedTodos = async (): Promise<SuggestedTodo[]> => {
+export const getTodaysSuggestedTodos = async (): Promise<Todo[]> => {
   try {
     const response = await fetch("/api/todos/suggested");
     if (!response.ok) {
@@ -31,7 +31,7 @@ export const getTodaysSuggestedTodos = async (): Promise<SuggestedTodo[]> => {
 };
 
 // Function to fetch upcoming suggested todos from database API
-export const getUpcomingSuggestedTodos = async (): Promise<SuggestedTodo[]> => {
+export const getUpcomingSuggestedTodos = async (): Promise<Todo[]> => {
   try {
     const response = await fetch("/api/todos/suggested?filter=upcoming");
     if (!response.ok) {

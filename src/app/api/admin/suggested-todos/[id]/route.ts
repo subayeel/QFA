@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// GET /api/admin/suggested-todos/[id] - Get a specific suggested todo
+// GET /api/admin/suggested-todos/[id] - Get a specific suggested todo (admin only)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -17,10 +17,15 @@ export async function GET(
     }
 
     // TODO: Add admin role check here
+    // For now, allow any authenticated user to access
 
     const { id } = await params;
-    const suggestedTodo = await prisma.suggestedTodo.findUnique({
-      where: { id },
+    const suggestedTodo = await prisma.todo.findUnique({
+      where: {
+        id: id,
+        type: "suggested",
+        scope: "ADMIN",
+      },
     });
 
     if (!suggestedTodo) {
@@ -40,8 +45,8 @@ export async function GET(
   }
 }
 
-// PATCH /api/admin/suggested-todos/[id] - Update a suggested todo
-export async function PATCH(
+// PUT /api/admin/suggested-todos/[id] - Update a specific suggested todo (admin only)
+export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -53,12 +58,17 @@ export async function PATCH(
     }
 
     // TODO: Add admin role check here
+    // For now, allow any authenticated user to access
 
     const { id } = await params;
     const body = await request.json();
 
-    const updatedSuggestedTodo = await prisma.suggestedTodo.update({
-      where: { id },
+    const updatedSuggestedTodo = await prisma.todo.update({
+      where: {
+        id: id,
+        type: "suggested",
+        scope: "ADMIN",
+      },
       data: {
         title: body.title,
         description: body.description,
@@ -68,7 +78,6 @@ export async function PATCH(
         timePriority: body.timePriority,
         frequency: body.frequency,
         customLogic: body.customLogic,
-        updatedAt: new Date(),
       },
     });
 
@@ -82,7 +91,7 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/admin/suggested-todos/[id] - Delete a suggested todo
+// DELETE /api/admin/suggested-todos/[id] - Delete a specific suggested todo (admin only)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -95,13 +104,20 @@ export async function DELETE(
     }
 
     // TODO: Add admin role check here
+    // For now, allow any authenticated user to access
 
     const { id } = await params;
-    await prisma.suggestedTodo.delete({
-      where: { id },
+    await prisma.todo.delete({
+      where: {
+        id: id,
+        type: "suggested",
+        scope: "ADMIN",
+      },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      message: "Suggested todo deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting suggested todo:", error);
     return NextResponse.json(

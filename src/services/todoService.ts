@@ -6,7 +6,6 @@ import {
   TodoFilter,
   TodoStats,
 } from "@/types/todos.types";
-import { SuggestedTodo } from "@/types/todos.types";
 import {
   smartSortTodos,
   getCurrentPrayerContext,
@@ -42,6 +41,9 @@ export class TodoService {
         priority: dbUserTodo.todo.priority as "high" | "medium" | "low",
         timePriority: dbUserTodo.todo.timePriority || undefined,
         type: dbUserTodo.todo.type as "custom" | "suggested",
+        scope: dbUserTodo.todo.scope as "USER" | "ADMIN",
+        frequency: dbUserTodo.todo.frequency || undefined,
+        customLogic: dbUserTodo.todo.customLogic || undefined,
         createdAt:
           typeof dbUserTodo.todo.createdAt === "string"
             ? dbUserTodo.todo.createdAt
@@ -385,23 +387,8 @@ export class TodoService {
     return this.getSuggestedTodos(date, "today");
   }
 
-  static async getUpcomingSuggestedTodos(): Promise<SuggestedTodo[]> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to fetch suggested todos");
-    }
-
-    try {
-      const response = await fetch("/api/todos/suggested?filter=upcoming");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const suggestedUserTodos = await response.json();
-      return suggestedUserTodos.map((userTodo: any) => userTodo.todo);
-    } catch (error) {
-      this.handleApiError(error, "fetch upcoming suggested todos");
-    }
+  static async getUpcomingSuggestedTodos(): Promise<UserTodo[]> {
+    return this.getSuggestedTodos(new Date(), "upcoming");
   }
 
   static async getCombinedTodos(

@@ -24,8 +24,10 @@ export async function GET(request: NextRequest) {
     const dayOfWeek = targetDate.getDay();
 
     // Fetch suggested todos from database based on frequency
-    const suggestedTodos = await prisma.suggestedTodo.findMany({
+    const suggestedTodos = await prisma.todo.findMany({
       where: {
+        type: "suggested",
+        scope: "ADMIN",
         OR: [
           { frequency: "daily" },
           {
@@ -77,6 +79,9 @@ export async function GET(request: NextRequest) {
         priority: suggested.priority,
         timePriority: suggested.timePriority,
         type: "suggested" as const,
+        scope: suggested.scope,
+        frequency: suggested.frequency,
+        customLogic: suggested.customLogic,
         createdAt: targetDate.toISOString(),
         updatedAt: targetDate.toISOString(),
       },

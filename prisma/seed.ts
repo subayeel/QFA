@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Scope } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -11,6 +11,8 @@ const suggestedTodos = [
     time: "04:21",
     category: "prayer",
     priority: "high",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     customLogic: "prayer_times",
     timePriority: 1,
@@ -22,6 +24,8 @@ const suggestedTodos = [
     time: "12:30",
     category: "prayer",
     priority: "high",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     customLogic: "prayer_times",
     timePriority: 2,
@@ -33,6 +37,8 @@ const suggestedTodos = [
     time: "15:45",
     category: "prayer",
     priority: "high",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     customLogic: "prayer_times",
     timePriority: 3,
@@ -44,6 +50,8 @@ const suggestedTodos = [
     time: "18:30",
     category: "prayer",
     priority: "high",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     customLogic: "prayer_times",
     timePriority: 4,
@@ -55,6 +63,8 @@ const suggestedTodos = [
     time: "20:00",
     category: "prayer",
     priority: "high",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     customLogic: "prayer_times",
     timePriority: 5,
@@ -67,6 +77,8 @@ const suggestedTodos = [
     description: "Read at least one page of Quran daily",
     category: "quran",
     priority: "high",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     timePriority: 10,
   },
@@ -77,6 +89,8 @@ const suggestedTodos = [
     time: "21:00",
     category: "quran",
     priority: "medium",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     timePriority: 15,
   },
@@ -86,6 +100,8 @@ const suggestedTodos = [
     description: "Recite Ayat Al-Kursi after each prayer",
     category: "quran",
     priority: "medium",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     timePriority: 12,
   },
@@ -98,6 +114,8 @@ const suggestedTodos = [
     time: "06:00",
     category: "dhikr",
     priority: "medium",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     timePriority: 8,
   },
@@ -108,6 +126,8 @@ const suggestedTodos = [
     time: "18:00",
     category: "dhikr",
     priority: "medium",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     timePriority: 14,
   },
@@ -117,6 +137,8 @@ const suggestedTodos = [
     description: "Recite Istighfar (Astaghfirullah) 100 times",
     category: "dhikr",
     priority: "medium",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "daily",
     timePriority: 20,
   },
@@ -128,6 +150,8 @@ const suggestedTodos = [
     description: "Attend Friday prayer at the mosque",
     category: "prayer",
     priority: "high",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "weekly",
     customLogic: "friday",
     timePriority: 1,
@@ -138,6 +162,8 @@ const suggestedTodos = [
     description: "Read and understand Quran translation",
     category: "learning",
     priority: "medium",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "weekly",
     customLogic: "sunday",
     timePriority: 25,
@@ -148,6 +174,8 @@ const suggestedTodos = [
     description: "Give charity to the poor and needy",
     category: "charity",
     priority: "medium",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "weekly",
     customLogic: "monday",
     timePriority: 30,
@@ -160,6 +188,8 @@ const suggestedTodos = [
     description: "Complete reading the entire Quran",
     category: "quran",
     priority: "high",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "monthly",
     customLogic: "monthly",
     timePriority: 5,
@@ -170,6 +200,8 @@ const suggestedTodos = [
     description: "Give monthly charity (Sadaqah)",
     category: "charity",
     priority: "medium",
+    type: "suggested",
+    scope: Scope.ADMIN,
     frequency: "monthly",
     customLogic: "monthly",
     timePriority: 35,
@@ -179,13 +211,17 @@ const suggestedTodos = [
 async function main() {
   console.log("🌱 Starting database seed...");
 
-  // Clear existing suggested todos
-  await prisma.suggestedTodo.deleteMany({});
+  // Clear existing suggested todos (todos with type "suggested")
+  await prisma.todo.deleteMany({
+    where: {
+      type: "suggested",
+    },
+  });
   console.log("🗑️  Cleared existing suggested todos");
 
   // Insert suggested todos
   for (const todo of suggestedTodos) {
-    await prisma.suggestedTodo.create({
+    await prisma.todo.create({
       data: todo,
     });
   }
