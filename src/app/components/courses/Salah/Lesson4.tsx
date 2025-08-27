@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Sparkles } from "lucide-react";
 
 function SalahLesson4() {

@@ -1,5 +1,5 @@
 import { UserTodo } from "@/types/todos.types";
-import { timeToMinutes } from "./prayerTimes";
+import { PrayerTimes, timeToMinutes } from "./prayerTimes";
 
 export interface SmartSortingContext {
   currentTime: Date;
@@ -14,12 +14,15 @@ export interface SmartSortingContext {
 }
 
 // Default prayer times (fallback if location is not available)
-const DEFAULT_PRAYER_TIMES = {
+const DEFAULT_PRAYER_TIMES: PrayerTimes = {
   fajr: "05:30",
   dhuhr: "12:30",
   asr: "15:45",
   maghrib: "18:30",
   isha: "20:00",
+  sunrise: "06:45",
+  sunset: "18:15",
+  midnight: "23:30",
 };
 
 // Get current time of day category
@@ -156,10 +159,10 @@ const calculateTimePriority = (
   }
 
   // Penalize completed and missed todos
-  if (todo.completed) {
+  if (userTodo.completed) {
     priority -= 50000;
   }
-  if (todo.missed) {
+  if (userTodo.missed) {
     priority -= 20000;
   }
 
@@ -182,7 +185,7 @@ export const smartSortTodos = (
       // This would need to be called with actual location data
       // For now, we'll use default times
       currentContext.prayerTimes = DEFAULT_PRAYER_TIMES;
-    } catch (error) {
+    } catch {
       currentContext.prayerTimes = DEFAULT_PRAYER_TIMES;
     }
   }
@@ -225,7 +228,7 @@ export const getCurrentPrayerContext =
           DEFAULT_PRAYER_TIMES
         ),
       };
-    } catch (error) {
+    } catch {
       return {
         currentTime,
         prayerTimes: DEFAULT_PRAYER_TIMES,
@@ -239,7 +242,7 @@ export const getCurrentPrayerContext =
 
 // Enhanced version that accepts prayer times from the app
 export const getCurrentPrayerContextWithTimes = (
-  prayerTimes: any
+  prayerTimes: PrayerTimes
 ): SmartSortingContext => {
   const currentTime = new Date();
 
@@ -256,7 +259,7 @@ export const getCurrentPrayerContextWithTimes = (
 // Helper function to determine current prayer from time
 const getCurrentPrayerFromTime = (
   currentTime: Date,
-  prayerTimes: any
+  prayerTimes: PrayerTimes
 ): string => {
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();

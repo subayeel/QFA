@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { ChevronDown } from "lucide-react";
 
 function ImaanLesson5() {

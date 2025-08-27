@@ -37,12 +37,13 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { SignOutButton } from "@/app/components/SignOutButton";
+import Image from "next/image";
 
 function Home() {
   const [todos, setTodos] = useState<UserTodo[]>([]);
   const [currentFilter, setCurrentFilter] = useState<TodoFilter>("today");
-  const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
-  const [location, setLocation] = useState<LocationData | null>(null);
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | undefined>();
+  const [location, setLocation] = useState<LocationData | undefined>();
   const [currentPrayerInfo, setCurrentPrayerInfo] =
     useState<CurrentPrayerInfo | null>(null);
   const [islamicDate, setIslamicDate] = useState<{
@@ -329,8 +330,8 @@ function Home() {
     }
   };
 
-  const groupTodosByDate = (todos: Todo[]) => {
-    const groups: { [key: string]: Todo[] } = {};
+  const groupTodosByDate = (todos: UserTodo[]) => {
+    const groups: { [key: string]: UserTodo[] } = {};
 
     todos.forEach((todo) => {
       const dateKey = todo.date.split("T")[0];
@@ -401,9 +402,10 @@ function Home() {
                     </div>
 
                     <div className="h-full flex items-end justify-end bg-gray-100 border rounded-2xl">
-                      <img
+                      <Image
                         src={"/salah-icon.png"}
                         className="object-contain h-24"
+                        alt="salah"
                       />
                     </div>
                   </div>
@@ -452,9 +454,10 @@ function Home() {
                     </div>
 
                     <div className="absolute right-0 bottom-0">
-                      <img
+                      <Image
                         src={"/home-quran.png"}
                         className="object-contain h-16 sm:h-24"
+                        alt="quran"
                       />
                     </div>
                   </div>
@@ -500,7 +503,11 @@ function Home() {
               </div>
 
               <div className="flex items-end justify-end bg-gray-100 border rounded-2xl p-2">
-                <img src={"/salah-icon.png"} className="object-contain h-20" />
+                <Image
+                  src={"/salah-icon.png"}
+                  className="object-contain h-20"
+                  alt="salah"
+                />
               </div>
             </div>
           </Card>
@@ -542,7 +549,11 @@ function Home() {
               </div>
 
               <div className="absolute right-4 bottom-4">
-                <img src="/home-quran.png" className="object-contain h-16" />
+                <Image
+                  src="/home-quran.png"
+                  className="object-contain h-16"
+                  alt="quran"
+                />
               </div>
             </div>
           </Card>
@@ -629,7 +640,7 @@ function Home() {
             </div>
 
             <div className="absolute bottom-2 right-0 lg:bottom-4 lg:right-4">
-              <img
+              <Image
                 src={"/home-mosque.png"}
                 alt="mosque"
                 className="object-contain h-28 sm:h-40 lg:h-48"
@@ -643,7 +654,7 @@ function Home() {
                   Fajr
                 </p>
                 <div className="flex justify-center">
-                  <img
+                  <Image
                     src={"/fajr-icon.svg"}
                     alt="Fajr"
                     className={`w-8 h-8 lg:w-10 lg:h-10 ${
@@ -662,7 +673,7 @@ function Home() {
                   Dhuhr
                 </p>
                 <div className="flex justify-center">
-                  <img
+                  <Image
                     src={"/dhuhr-icon.svg"}
                     alt="Dhuhr"
                     className={`w-8 h-8 lg:w-10 lg:h-10 ${
@@ -681,7 +692,7 @@ function Home() {
                   Asr
                 </p>
                 <div className="flex justify-center">
-                  <img
+                  <Image
                     src={"/asr-icon.svg"}
                     alt="Asr"
                     className={`w-8 h-8 lg:w-10 lg:h-10 ${
@@ -700,7 +711,7 @@ function Home() {
                   Maghrib
                 </p>
                 <div className="flex justify-center">
-                  <img
+                  <Image
                     src={"/maghrib-icon.svg"}
                     alt="Maghrib"
                     className={`w-8 h-8 lg:w-10 lg:h-10 ${
@@ -719,7 +730,7 @@ function Home() {
                   Isha
                 </p>
                 <div className="flex justify-center">
-                  <img
+                  <Image
                     src={"/isha-icon.svg"}
                     alt="Isha"
                     className={`w-8 h-8 lg:w-10 lg:h-10 ${
@@ -885,7 +896,7 @@ function Home() {
               {" "}
               15min / lesson
             </p>
-            <img
+            <Image
               src={"/imaan-icon.png"}
               alt="imaan"
               className="object-contain absolute bottom-2 right-4 h-20 sm:h-32 lg:h-28 lg:bottom-4 lg:right-6"
@@ -904,7 +915,7 @@ function Home() {
               {" "}
               15min / lesson
             </p>
-            <img
+            <Image
               src={"/salah-icon.png"}
               alt="history"
               className="object-contain absolute bottom-0 right-0 h-32 lg:h-36 lg:bottom-2 lg:right-2"
@@ -923,7 +934,7 @@ function Home() {
               {" "}
               15min / lesson
             </p>
-            <img
+            <Image
               src={"/history-icon.png"}
               alt="history"
               className="object-contain absolute bottom-4 right-4 h-20 sm:h-32 lg:h-28 lg:bottom-6 lg:right-6"
@@ -942,7 +953,7 @@ function Home() {
               {" "}
               15min / lesson
             </p>
-            <img
+            <Image
               src={"/miracles-icon.png"}
               alt="history"
               className="object-contain absolute bottom-0 right-0 h-24 lg:h-28 lg:bottom-2 lg:right-2"
@@ -962,7 +973,7 @@ function Home() {
               {" "}
               10min / lesson
             </p>
-            <img
+            <Image
               src={"/ethics-icon.png"}
               alt="history"
               className="object-contain absolute bottom-2 right-2 h-24 lg:h-28 lg:bottom-4 lg:right-4"
@@ -982,9 +993,9 @@ function Home() {
               {" "}
               10min / lesson
             </p>
-            <img
+            <Image
               src={"/arabic-icon.png"}
-              alt="history"
+              alt="arabic"
               className="object-contain absolute bottom-0 right-0 h-24 lg:h-28 lg:bottom-2 lg:right-2"
             />
           </Card>

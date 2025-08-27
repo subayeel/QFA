@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Book } from "lucide-react";
 
 function SalahLesson2() {

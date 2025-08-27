@@ -39,7 +39,7 @@ export function LoginForm() {
       } else {
         window.location.href = "/";
       }
-    } catch (error) {
+    } catch {
       setError("Something went wrong");
     } finally {
       setIsLoading(false);

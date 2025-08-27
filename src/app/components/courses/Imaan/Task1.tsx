@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 function ImaanTask1() {
   return (
     <div>

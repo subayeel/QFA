@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { courses } from "@/utils/courses";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   CourseProgressService,
   CourseProgressData,
@@ -15,12 +16,10 @@ function CoursesLayout() {
     completedLessons: [],
     completedTasks: [],
   });
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourseProgress = async () => {
       if (!session?.user?.id) {
-        setIsLoading(false);
         return;
       }
 
@@ -30,8 +29,6 @@ function CoursesLayout() {
         setCourseProgress(progress);
       } catch (error) {
         console.error("Error fetching course progress:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -100,7 +97,7 @@ function CoursesLayout() {
                       </div>
                     }
                   </div>
-                  <img
+                  <Image
                     src={course.image}
                     alt={course.name}
                     className="object-contain absolute bottom-2 right-4 h-20 sm:h-32 md:h-24 lg:h-32"

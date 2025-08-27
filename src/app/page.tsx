@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 
 export default async function Home() {
   const session = await auth();
@@ -35,7 +36,7 @@ export default async function Home() {
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-4">
                   {session.user.image && (
-                    <img
+                    <Image
                       src={session.user.image}
                       alt="Profile"
                       className="w-12 h-12 rounded-full"

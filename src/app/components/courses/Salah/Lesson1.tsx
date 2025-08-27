@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Hand } from "lucide-react";
 
 function SalahLesson1() {

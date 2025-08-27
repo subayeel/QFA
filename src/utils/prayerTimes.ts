@@ -1,4 +1,3 @@
-// @ts-ignore
 import { PrayTime } from "./praytime.js";
 
 export interface PrayerTimes {

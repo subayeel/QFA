@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // GET /api/admin/suggested-todos - Get all suggested todos (admin only)
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
 

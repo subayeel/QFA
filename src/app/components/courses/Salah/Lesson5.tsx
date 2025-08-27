@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Heart } from "lucide-react";
 
 function SalahLesson5() {

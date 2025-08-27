@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // GET /api/admin/suggested-todos/[id] - Get a specific suggested todo
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -18,8 +18,9 @@ export async function GET(
 
     // TODO: Add admin role check here
 
+    const { id } = await params;
     const suggestedTodo = await prisma.suggestedTodo.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!suggestedTodo) {
@@ -42,7 +43,7 @@ export async function GET(
 // PATCH /api/admin/suggested-todos/[id] - Update a suggested todo
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -53,10 +54,11 @@ export async function PATCH(
 
     // TODO: Add admin role check here
 
+    const { id } = await params;
     const body = await request.json();
 
     const updatedSuggestedTodo = await prisma.suggestedTodo.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title: body.title,
         description: body.description,
@@ -83,7 +85,7 @@ export async function PATCH(
 // DELETE /api/admin/suggested-todos/[id] - Delete a suggested todo
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -94,8 +96,9 @@ export async function DELETE(
 
     // TODO: Add admin role check here
 
+    const { id } = await params;
     await prisma.suggestedTodo.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

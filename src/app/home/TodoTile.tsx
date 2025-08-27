@@ -8,7 +8,6 @@ import {
   MoreVertical,
   Clock,
   Archive,
-  Edit,
   CheckCircle,
   XCircle,
   Trash,

@@ -72,7 +72,6 @@ function UpdateTodoDrawer({ todo, onTodoUpdated }: UpdateTodoDrawerProps) {
         title: formData.title,
         description: formData.description || undefined,
         time: formData.time || undefined,
-        date: formData.date,
         category: formData.category as
           | "prayer"
           | "quran"

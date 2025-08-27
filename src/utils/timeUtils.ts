@@ -1,3 +1,6 @@
+import { UserTodo } from "@/types/todos.types";
+import { PrayerTimes } from "./prayerTimes";
+
 /**
  * Converts 24-hour format time to 12-hour format
  * @param time - Time in 24-hour format (HH:MM)
@@ -26,7 +29,7 @@ export const formatTime24Hour = (time: string): string => {
   const timeMatch = time.match(/(\d+):(\d+)\s*(AM|PM)/i);
   if (!timeMatch) return time;
 
-  let [_, hours, minutes, period] = timeMatch;
+  const [, hours, minutes, period] = timeMatch;
   let hour = parseInt(hours);
 
   if (period.toUpperCase() === "PM" && hour !== 12) {
@@ -115,7 +118,10 @@ export const getCurrentTimePeriod = ():
  * @param prayerTimes - Current prayer times
  * @returns True if todo should be shown
  */
-export const shouldShowTodo = (userTodo: any, prayerTimes?: any): boolean => {
+export const shouldShowTodo = (
+  userTodo: UserTodo,
+  prayerTimes?: PrayerTimes
+): boolean => {
   const todo = userTodo.todo;
 
   // If no time specified, always show
@@ -160,18 +166,21 @@ export const shouldShowTodo = (userTodo: any, prayerTimes?: any): boolean => {
  * @param prayerTimes - Current prayer times for accurate sorting
  * @returns Sorted array of todos
  */
-export const sortTodosByTime = (todos: any[], prayerTimes?: any): any[] => {
+export const sortTodosByTime = (
+  todos: UserTodo[],
+  prayerTimes?: PrayerTimes
+): UserTodo[] => {
   return todos.sort((a, b) => {
     // If no time, put at the end
-    if (!a.time && !b.time) return 0;
-    if (!a.time) return 1;
-    if (!b.time) return -1;
+    if (!a.todo.time && !b.todo.time) return 0;
+    if (!a.todo.time) return 1;
+    if (!b.todo.time) return -1;
 
     // For prayer todos, use actual prayer times for sorting
-    let timeA = timeToMinutes(a.time);
-    let timeB = timeToMinutes(b.time);
+    let timeA = timeToMinutes(a.todo.time);
+    let timeB = timeToMinutes(b.todo.time);
 
-    if (a.category === "prayer" && prayerTimes) {
+    if (a.todo.category === "prayer" && prayerTimes) {
       const prayerTimeMap: { [key: string]: string } = {
         "Fajr Prayer": prayerTimes.fajr,
         "Dhuhr Prayer": prayerTimes.dhuhr,
@@ -179,13 +188,13 @@ export const sortTodosByTime = (todos: any[], prayerTimes?: any): any[] => {
         "Maghrib Prayer": prayerTimes.maghrib,
         "Isha Prayer": prayerTimes.isha,
       };
-      const actualTimeA = prayerTimeMap[a.title];
+      const actualTimeA = prayerTimeMap[a.todo.title];
       if (actualTimeA) {
         timeA = timeToMinutes(actualTimeA);
       }
     }
 
-    if (b.category === "prayer" && prayerTimes) {
+    if (b.todo.category === "prayer" && prayerTimes) {
       const prayerTimeMap: { [key: string]: string } = {
         "Fajr Prayer": prayerTimes.fajr,
         "Dhuhr Prayer": prayerTimes.dhuhr,
@@ -193,7 +202,7 @@ export const sortTodosByTime = (todos: any[], prayerTimes?: any): any[] => {
         "Maghrib Prayer": prayerTimes.maghrib,
         "Isha Prayer": prayerTimes.isha,
       };
-      const actualTimeB = prayerTimeMap[b.title];
+      const actualTimeB = prayerTimeMap[b.todo.title];
       if (actualTimeB) {
         timeB = timeToMinutes(actualTimeB);
       }

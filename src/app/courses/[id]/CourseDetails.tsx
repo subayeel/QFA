@@ -162,7 +162,7 @@ function CourseDetails({
                                 title: "Task completed!",
                                 description: `You've completed "${task.taskName}"`,
                               });
-                            } catch (error) {
+                            } catch {
                               toast({
                                 title: "Error",
                                 description: "Failed to mark task as complete",
@@ -386,7 +386,7 @@ function CourseDetails({
                             title: "Lesson completed!",
                             description: `You've completed "${selectedLesson.lessonName}"`,
                           });
-                        } catch (error) {
+                        } catch {
                           toast({
                             title: "Error",
                             description: "Failed to mark lesson as complete",

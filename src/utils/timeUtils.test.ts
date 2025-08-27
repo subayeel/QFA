@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Simple test file to verify time-based filtering logic
 // This can be run manually to test the functionality
 
+import { UserTodo } from "@/types/todos.types";
 import {
   timeToMinutes,
   getCurrentTimeInMinutes,
@@ -13,43 +15,111 @@ import {
 // Mock prayer times for testing
 const mockPrayerTimes = {
   fajr: "05:30",
+  sunrise: "06:45",
   dhuhr: "12:30",
   asr: "15:45",
+  sunset: "18:15",
   maghrib: "18:30",
   isha: "20:00",
+  midnight: "23:30",
 };
 
 // Test todos
-const testTodos = [
+const testTodos: UserTodo[] = [
   {
     id: "1",
-    title: "Fajr Prayer",
-    category: "prayer",
-    time: "05:30",
+    date: "2025-01-01",
+    completed: false,
+    missed: false,
+    archived: false,
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+    todo: {
+      id: "1",
+      title: "Fajr Prayer",
+      category: "prayer",
+      time: "05:30",
+      priority: "high",
+      type: "custom",
+      createdAt: "2025-01-01T00:00:00Z",
+      updatedAt: "2025-01-01T00:00:00Z",
+    },
   },
   {
     id: "2",
-    title: "Morning Dhikr",
-    category: "dhikr",
-    time: "06:00",
+    date: "2025-01-01",
+    completed: false,
+    missed: false,
+    archived: false,
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+    todo: {
+      id: "2",
+      title: "Morning Dhikr",
+      category: "dhikr",
+      time: "06:00",
+      priority: "medium",
+      type: "custom",
+      createdAt: "2025-01-01T00:00:00Z",
+      updatedAt: "2025-01-01T00:00:00Z",
+    },
   },
   {
     id: "3",
-    title: "Dhuhr Prayer",
-    category: "prayer",
-    time: "12:30",
+    date: "2025-01-01",
+    completed: false,
+    missed: false,
+    archived: false,
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+    todo: {
+      id: "3",
+      title: "Dhuhr Prayer",
+      category: "prayer",
+      time: "12:30",
+      priority: "high",
+      type: "custom",
+      createdAt: "2025-01-01T00:00:00Z",
+      updatedAt: "2025-01-01T00:00:00Z",
+    },
   },
   {
     id: "4",
-    title: "Evening Dhikr",
-    category: "dhikr",
-    time: "18:00",
+    date: "2025-01-01",
+    completed: false,
+    missed: false,
+    archived: false,
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+    todo: {
+      id: "4",
+      title: "Evening Dhikr",
+      category: "dhikr",
+      time: "18:00",
+      priority: "medium",
+      type: "custom",
+      createdAt: "2025-01-01T00:00:00Z",
+      updatedAt: "2025-01-01T00:00:00Z",
+    },
   },
   {
     id: "5",
-    title: "Study Quran",
-    category: "quran",
-    time: "14:00",
+    date: "2025-01-01",
+    completed: false,
+    missed: false,
+    archived: false,
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+    todo: {
+      id: "5",
+      title: "Study Quran",
+      category: "quran",
+      time: "14:00",
+      priority: "medium",
+      type: "custom",
+      createdAt: "2025-01-01T00:00:00Z",
+      updatedAt: "2025-01-01T00:00:00Z",
+    },
   },
 ];
 
@@ -76,7 +146,7 @@ export function testTimeBasedFiltering() {
   testTodos.forEach((todo) => {
     const shouldShow = shouldShowTodo(todo, mockPrayerTimes);
     console.log(
-      `${todo.title} (${todo.time}): ${shouldShow ? "SHOW" : "HIDE"}`
+      `${todo.todo.title} (${todo.todo.time}): ${shouldShow ? "SHOW" : "HIDE"}`
     );
   });
 
@@ -92,15 +162,17 @@ export function testTimeBasedFiltering() {
   );
 
   // Test prayer todos specifically
-  const prayerTodos = testTodos.filter((todo) => todo.category === "prayer");
+  const prayerTodos = testTodos.filter(
+    (todo) => todo.todo.category === "prayer"
+  );
   prayerTodos.forEach((todo) => {
     const shouldShow = shouldShowTodo(todo, mockPrayerTimes);
-    const prayerKey = todo.title
+    const prayerKey = todo.todo.title
       .toLowerCase()
       .replace(" prayer", "") as keyof typeof mockPrayerTimes;
     const actualPrayerTime = mockPrayerTimes[prayerKey];
     console.log(
-      `${todo.title} (API time: ${actualPrayerTime}): ${
+      `${todo.todo.title} (API time: ${actualPrayerTime}): ${
         shouldShow ? "SHOW" : "HIDE"
       }`
     );
@@ -112,7 +184,7 @@ export function testTimeBasedFiltering() {
   const sortedTodos = sortTodosByTime([...testTodos]);
   console.log("Sorted todos by time:");
   sortedTodos.forEach((todo) => {
-    console.log(`- ${todo.title}: ${todo.time}`);
+    console.log(`- ${todo.todo.title}: ${todo.todo.time}`);
   });
 
   console.log("\n=== Testing Filtered and Sorted Todos ===");
@@ -125,7 +197,7 @@ export function testTimeBasedFiltering() {
 
   console.log("Final todos to display:");
   finalTodos.forEach((todo) => {
-    console.log(`- ${todo.title}: ${todo.time}`);
+    console.log(`- ${todo.todo.title}: ${todo.todo.time}`);
   });
 }
 

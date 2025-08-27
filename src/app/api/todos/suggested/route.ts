@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
 
     const targetDate = date ? new Date(date) : new Date();
     const dayOfWeek = targetDate.getDay();
-    const isFirstDayOfMonth = targetDate.getDate() === 1;
 
     // Fetch suggested todos from database based on frequency
     const suggestedTodos = await prisma.suggestedTodo.findMany({

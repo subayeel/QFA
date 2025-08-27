@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Check } from "lucide-react";
 
 function ImaanLesson7() {

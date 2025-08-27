@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // POST /api/todos/[id]/actions - Perform actions on a todo
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -16,12 +16,13 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const { action } = await request.json();
 
     // Verify the userTodo belongs to the user
     const existingUserTodo = await prisma.userTodo.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
       include: {
@@ -38,7 +39,7 @@ export async function POST(
     switch (action) {
       case "toggle_complete":
         updatedUserTodo = await prisma.userTodo.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             completed: !existingUserTodo.completed,
             missed: false, // Reset missed when completing
@@ -52,7 +53,7 @@ export async function POST(
 
       case "mark_missed":
         updatedUserTodo = await prisma.userTodo.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             missed: true,
             completed: false, // Reset completed when marking as missed
@@ -66,7 +67,7 @@ export async function POST(
 
       case "archive":
         updatedUserTodo = await prisma.userTodo.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             archived: true,
             updatedAt: new Date(),
@@ -79,7 +80,7 @@ export async function POST(
 
       case "unarchive":
         updatedUserTodo = await prisma.userTodo.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             archived: false,
             updatedAt: new Date(),

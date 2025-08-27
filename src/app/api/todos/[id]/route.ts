@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // PATCH /api/todos/[id] - Update a todo
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -17,12 +17,13 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const body: UpdateTodoData = await request.json();
 
     // Verify the userTodo belongs to the user
     const existingUserTodo = await prisma.userTodo.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
       include: {
@@ -35,7 +36,7 @@ export async function PATCH(
     }
 
     // Update the todo definition
-    const updatedTodo = await prisma.todo.update({
+    await prisma.todo.update({
       where: {
         id: existingUserTodo.todoId,
       },
@@ -53,7 +54,7 @@ export async function PATCH(
     // Update the userTodo instance
     const updatedUserTodo = await prisma.userTodo.update({
       where: {
-        id: params.id,
+        id,
       },
       data: {
         updatedAt: new Date(),
@@ -76,7 +77,7 @@ export async function PATCH(
 // DELETE /api/todos/[id] - Delete a todo
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -85,10 +86,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     // Verify the userTodo belongs to the user
     const existingUserTodo = await prisma.userTodo.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
       include: {
@@ -103,7 +105,7 @@ export async function DELETE(
     // Delete the userTodo instance
     await prisma.userTodo.delete({
       where: {
-        id: params.id,
+        id,
       },
     });
 

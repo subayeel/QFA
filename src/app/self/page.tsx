@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { SignOutButton } from "@/app/components/SignOutButton";
 import { prisma } from "@/lib/prisma";
 import { courses } from "@/utils/courses";
+import Image from "next/image";
 import {
   Target,
   Heart,
@@ -258,7 +259,7 @@ export default async function UserProfilePage() {
             {/* Profile Image */}
             {session.user.image && (
               <div className="flex-shrink-0">
-                <img
+                <Image
                   src={session.user.image}
                   alt="Profile"
                   className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-lg"

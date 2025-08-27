@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Eye } from "lucide-react";
 
 function SalahLesson6() {
