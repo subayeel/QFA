@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { PrismaClient } from "@prisma/client";
+import { getTodayDate } from "@/utils/timeUtils";
 
 const prisma = new PrismaClient();
 
@@ -20,8 +21,12 @@ export async function GET(request: NextRequest) {
       | "upcoming"
       | undefined;
 
-    const targetDate = date ? new Date(date) : new Date();
+    const targetDate = date ? new Date(date) : getTodayDate();
     const dayOfWeek = targetDate.getDay();
+
+    // Normalize targetDate to start of day to avoid timezone issues
+    const normalizedTargetDate = new Date(targetDate);
+    normalizedTargetDate.setHours(0, 0, 0, 0);
 
     // Fetch suggested todos from database based on frequency
     const suggestedTodos = await prisma.todo.findMany({
@@ -66,7 +71,7 @@ export async function GET(request: NextRequest) {
     // Convert suggested todos to UserTodo format
     const userTodos = suggestedTodos.map((suggested, index) => ({
       id: `suggested_${suggested.id}_${Date.now()}_${index}`,
-      date: targetDate.toISOString(),
+      date: normalizedTargetDate.toISOString(),
       completed: false,
       missed: false,
       archived: false,
@@ -82,11 +87,11 @@ export async function GET(request: NextRequest) {
         scope: suggested.scope,
         frequency: suggested.frequency,
         customLogic: suggested.customLogic,
-        createdAt: targetDate.toISOString(),
-        updatedAt: targetDate.toISOString(),
+        createdAt: normalizedTargetDate.toISOString(),
+        updatedAt: normalizedTargetDate.toISOString(),
       },
-      createdAt: targetDate.toISOString(),
-      updatedAt: targetDate.toISOString(),
+      createdAt: normalizedTargetDate.toISOString(),
+      updatedAt: normalizedTargetDate.toISOString(),
     }));
 
     // Filter based on request

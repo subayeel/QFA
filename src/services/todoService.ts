@@ -226,7 +226,13 @@ export class TodoService {
     }
 
     try {
-      const response = await fetch(`/api/todos/${id}/actions`, {
+      // Determine the correct API endpoint based on whether it's a suggested todo
+      const isSuggestedTodo = id.startsWith("suggested_");
+      const apiEndpoint = isSuggestedTodo
+        ? `/api/todos/suggested/${id.replace("suggested_", "")}/actions`
+        : `/api/todos/${id}/actions`;
+
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -255,7 +261,13 @@ export class TodoService {
     }
 
     try {
-      const response = await fetch(`/api/todos/${id}/actions`, {
+      // Determine the correct API endpoint based on whether it's a suggested todo
+      const isSuggestedTodo = id.startsWith("suggested_");
+      const apiEndpoint = isSuggestedTodo
+        ? `/api/todos/suggested/${id.replace("suggested_", "")}/actions`
+        : `/api/todos/${id}/actions`;
+
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -284,7 +296,13 @@ export class TodoService {
     }
 
     try {
-      const response = await fetch(`/api/todos/${id}/actions`, {
+      // Determine the correct API endpoint based on whether it's a suggested todo
+      const isSuggestedTodo = id.startsWith("suggested_");
+      const apiEndpoint = isSuggestedTodo
+        ? `/api/todos/suggested/${id.replace("suggested_", "")}/actions`
+        : `/api/todos/${id}/actions`;
+
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -313,7 +331,13 @@ export class TodoService {
     }
 
     try {
-      const response = await fetch(`/api/todos/${id}/actions`, {
+      // Determine the correct API endpoint based on whether it's a suggested todo
+      const isSuggestedTodo = id.startsWith("suggested_");
+      const apiEndpoint = isSuggestedTodo
+        ? `/api/todos/suggested/${id.replace("suggested_", "")}/actions`
+        : `/api/todos/${id}/actions`;
+
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -261,22 +261,22 @@ function Home() {
     loadLocationAndPrayerTimes();
   }, [retryCount]);
 
-  // Update prayer info and todos every minute
-  useEffect(() => {
-    if (!prayerTimes) return;
+  // // Update prayer info and todos every minute
+  // useEffect(() => {
+  //   if (!prayerTimes) return;
 
-    const interval = setInterval(async () => {
-      const prayerInfo = getCurrentPrayerInfo(prayerTimes);
-      setCurrentPrayerInfo(prayerInfo);
+  //   const interval = setInterval(async () => {
+  //     const prayerInfo = getCurrentPrayerInfo(prayerTimes);
+  //     setCurrentPrayerInfo(prayerInfo);
 
-      // Reload todos to handle time-based changes (only if authenticated)
-      if (isAuthenticated) {
-        await loadTodos();
-      }
-    }, 60000); // Update every minute
+  //     // Reload todos to handle time-based changes (only if authenticated)
+  //     if (isAuthenticated) {
+  //       await loadTodos();
+  //     }
+  //   }, 60000); // Update every minute
 
-    return () => clearInterval(interval);
-  }, [prayerTimes, loadTodos, isAuthenticated]);
+  //   return () => clearInterval(interval);
+  // }, [prayerTimes, loadTodos, isAuthenticated]);
 
   useEffect(() => {
     loadTodos();
@@ -345,6 +345,10 @@ function Home() {
   };
 
   const groupedTodos = groupTodosByDate(todos);
+
+  console.log("todos", todos);
+
+  console.log("groupedTodos", groupedTodos);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -831,11 +835,10 @@ function Home() {
             ) : (
               groupedTodos.map(([dateKey, dateTodos]) => (
                 <div key={dateKey} className="space-y-2">
-                  {currentFilter === "upcoming" && (
-                    <h3 className="text-sm font-medium text-gray-700 px-1 lg:text-base">
-                      {formatDate(dateKey)}
-                    </h3>
-                  )}
+                  <h3 className="text-sm font-medium text-gray-700 px-1 lg:text-base">
+                    {formatDate(dateKey)}
+                  </h3>
+
                   {dateTodos.map((todo) => (
                     <TodoTile
                       key={todo.id}

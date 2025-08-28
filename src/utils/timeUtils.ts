@@ -2,6 +2,16 @@ import { UserTodo } from "@/types/todos.types";
 import { PrayerTimes } from "./prayerTimes";
 
 /**
+ * Gets today's date normalized to start of day (00:00:00) to avoid timezone issues
+ * @returns Date object set to start of today
+ */
+export const getTodayDate = (): Date => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
+
+/**
  * Converts 24-hour format time to 12-hour format
  * @param time - Time in 24-hour format (HH:MM)
  * @returns Time in 12-hour format (H:MM AM/PM)
