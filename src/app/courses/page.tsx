@@ -35,10 +35,10 @@ function CoursesLayout() {
     fetchCourseProgress();
   }, [session?.user?.id]);
   return (
-    <div>
+    <div className="bg-gray-50">
       {/* Header */}
       <div className="p-6 md:p-10 space-y-2 pb-28 bg-teal-800">
-        <p className="text-2xl md:text-3xl lg:text-4xl max-w-[220px] md:max-w-none tracking-wider leading-none text-white font-semibold">
+        <p className="text-3xl md:text-3xl lg:text-4xl max-w-[300px] md:max-w-none tracking-wider leading-none text-white font-semibold">
           Find Your matching Courses
         </p>
         <p className="text-sm md:text-base text-white/80">
@@ -46,7 +46,7 @@ function CoursesLayout() {
         </p>
       </div>
 
-      <div className="px-6 md:px-8 lg:px-12 mt-[-60px] pb-8">
+      <div className="px-6 md:px-8 lg:px-12 mt-[-60px] md:mt-8 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-7xl mx-auto">
           {Object.values(courses).map((course) => {
             const courseCompletedLessons = [
@@ -64,7 +64,7 @@ function CoursesLayout() {
                 <Card
                   key={course.id}
                   style={{ backgroundColor: course.color }}
-                  className={`p-3 md:p-6 shadow-none relative cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 active:shadow-inner min-h-[120px] md:min-h-[180px]`}
+                  className={`p-3 md:p-6 border shadow-sm relative cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 active:shadow-inner min-h-[120px] md:min-h-[180px]`}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <p className="text-3xl md:text-2xl lg:text-3xl font-semibold tracking-wide text-black/80">
@@ -79,7 +79,7 @@ function CoursesLayout() {
                     {
                       <div className="mt-2">
                         <div className="flex items-center gap-2">
-                          <div className="w-full bg-black/10 rounded-full h-2 max-w-[50vw]">
+                          <div className="w-full bg-black/10 rounded-full h-2 max-w-[30vw] md:max-w-[200px]">
                             <div
                               className="bg-black/40 h-2 rounded-full transition-all duration-300"
                               style={{ width: `${completionPercentage}%` }}
@@ -100,7 +100,7 @@ function CoursesLayout() {
                   <Image
                     src={course.image}
                     alt={course.name}
-                    className="object-contain absolute bottom-2 right-4 h-20 sm:h-32 md:h-24 lg:h-32"
+                    className="object-contain absolute bottom-8 right-4 h-20 sm:h-32 md:h-24 lg:h-32"
                     width={100}
                     height={120}
                   />

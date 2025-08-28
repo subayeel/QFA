@@ -346,12 +346,8 @@ function Home() {
 
   const groupedTodos = groupTodosByDate(todos);
 
-  console.log("todos", todos);
-
-  console.log("groupedTodos", groupedTodos);
-
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto bg-gray-50">
       {/* Header */}
       <div className="flex justify-between items-center px-6 pt-12 pb-8 z-[99] lg:px-8 lg:pt-16 lg:pb-12">
         <div className="text-black/80">
@@ -383,7 +379,7 @@ function Home() {
           >
             <CarouselContent>
               <CarouselItem className="md:basis-1/2">
-                <Card className="bg-white relative p-4 overflow-hidden h-[140px] mx-12">
+                <Card className="bg-white shadow-none relative p-4 overflow-hidden h-[140px] mx-6">
                   <div className="flex gap-2 justify-between h-full">
                     <div className="flex flex-col justify-between mb-4 col-span-2">
                       <div>
@@ -419,7 +415,7 @@ function Home() {
               </CarouselItem>
 
               <CarouselItem className="md:basis-1/2">
-                <Card className="bg-white relative p-4 overflow-hidden h-[140px] mx-12">
+                <Card className="bg-white shadow-none relative p-4 overflow-hidden h-[140px] mx-6">
                   <div className="flex flex-col justify-between h-full">
                     <div>
                       <p className="text-lg sm:text-2xl font-semibold">
@@ -437,7 +433,7 @@ function Home() {
               </CarouselItem>
 
               <CarouselItem className="md:basis-1/2">
-                <Card className="bg-white relative p-4 overflow-hidden h-[150px] mx-12">
+                <Card className="bg-white shadow-none relative p-4 overflow-hidden h-[150px] mx-6">
                   <div className="flex flex-col justify-between h-full">
                     <div>
                       <div className="flex gap-2 items-center mb-4">
@@ -464,7 +460,7 @@ function Home() {
                         src={"/home-quran.png"}
                         className="object-contain h-16 sm:h-24"
                         alt="quran"
-                        width={100}
+                        width={70}
                         height={100}
                       />
                     </div>
@@ -814,7 +810,7 @@ function Home() {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-xs text-gray-500 lg:text-sm">
+              <div className="items-center gap-1 text-xs text-gray-500 lg:text-sm hidden lg:flex">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span>Live</span>
               </div>

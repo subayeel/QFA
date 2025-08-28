@@ -196,7 +196,7 @@ export default async function UserProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Profile Card */}
         <Card className="p-6 sm:p-8 mb-8 bg-white/80 backdrop-blur-sm shadow-none border">
@@ -300,195 +300,8 @@ export default async function UserProfilePage() {
                 ))}
               </div>
             </Card>
-
-            {/* Today's Todos */}
-            <Card className="p-6 sm:p-8 bg-white/80 backdrop-blur-sm border shadow-none">
-              <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
-                  Today&apos;s Tasks
-                </h3>
-              </div>
-
-              <div className="text-center">
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-orange-600 mb-3 sm:mb-4">
-                  {progressData.todayTodos.completed}/
-                  {progressData.todayTodos.total}
-                </div>
-                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                  Tasks Completed
-                </p>
-                <Progress
-                  value={progressData.todayTodos.percentage}
-                  className="h-3 sm:h-4"
-                />
-                <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">
-                  {progressData.todayTodos.percentage}% Complete
-                </p>
-
-                {/* Additional Todo Stats */}
-                {todayStats.total > 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="text-green-600">
-                        <div className="font-semibold">
-                          {todayStats.completed}
-                        </div>
-                        <div>Completed</div>
-                      </div>
-                      <div className="text-red-600">
-                        <div className="font-semibold">{todayStats.missed}</div>
-                        <div>Missed</div>
-                      </div>
-                      <div className="text-yellow-600">
-                        <div className="font-semibold">
-                          {todayStats.pending}
-                        </div>
-                        <div>Pending</div>
-                      </div>
-                      <div className="text-gray-600">
-                        <div className="font-semibold">{todayStats.total}</div>
-                        <div>Total</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
           </div>
         </div>
-
-        {/* Todo Summary */}
-        <div className="mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            Todo Summary
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <Card className="p-4 bg-white/80 backdrop-blur-sm border shadow-none">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {overallTodoStats.completed}
-                </div>
-                <div className="text-sm text-gray-600">Completed</div>
-              </div>
-            </Card>
-            <Card className="p-4 bg-white/80 backdrop-blur-sm border shadow-none">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">
-                  {overallTodoStats.missed}
-                </div>
-                <div className="text-sm text-gray-600">Missed</div>
-              </div>
-            </Card>
-            <Card className="p-4 bg-white/80 backdrop-blur-sm border shadow-none">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-600">
-                  {overallTodoStats.pending}
-                </div>
-                <div className="text-sm text-gray-600">Pending</div>
-              </div>
-            </Card>
-            <Card className="p-4 bg-white/80 backdrop-blur-sm border shadow-none">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-600">
-                  {overallTodoStats.archived}
-                </div>
-                <div className="text-sm text-gray-600">Archived</div>
-              </div>
-            </Card>
-          </div>
-        </div>
-
-        {/* Todo Analytics */}
-        {todayStats.total > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              Today&apos;s Analytics
-            </h2>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Category Breakdown */}
-              <Card className="p-6 sm:p-8 bg-white/80 backdrop-blur-sm border shadow-none">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
-                  Today by Category
-                </h3>
-                <div className="space-y-3">
-                  {Object.entries(categoryStats).map(([category, stats]) => (
-                    <div
-                      key={category}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-700 capitalize">
-                          {category}
-                        </span>
-                        <Badge variant="outline" className="text-xs">
-                          {stats.total}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-green-600">
-                          {stats.completed}✓
-                        </span>
-                        <span className="text-red-600">{stats.missed}✗</span>
-                        <span className="text-yellow-600">
-                          {stats.total - stats.completed - stats.missed}⏳
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Recent Activity */}
-              <Card className="p-6 sm:p-8 bg-white/80 backdrop-blur-sm border shadow-none">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
-                  Recent Activity
-                </h3>
-                <div className="space-y-3">
-                  {recentTodos.map((userTodo) => (
-                    <div
-                      key={userTodo.id}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {userTodo.todo.title}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(userTodo.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant={
-                            userTodo.completed
-                              ? "default"
-                              : userTodo.missed
-                              ? "destructive"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {userTodo.completed
-                            ? "Completed"
-                            : userTodo.missed
-                            ? "Missed"
-                            : "Pending"}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                  {recentTodos.length === 0 && (
-                    <p className="text-sm text-gray-500 text-center py-4">
-                      No recent activity
-                    </p>
-                  )}
-                </div>
-              </Card>
-            </div>
-          </div>
-        )}
 
         {/* Actions */}
         <div>
@@ -500,9 +313,9 @@ export default async function UserProfilePage() {
             {actions.map((action, index) => (
               <Card
                 key={index}
-                className="p-4 sm:p-6 bg-white/80 backdrop-blur-sm border shadow-none hover:shadow-xl transition-all duration-300 cursor-pointer group"
+                className="p-4 sm:p-6 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-300 cursor-pointer group"
               >
-                <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-center sm:items-start lg:items-center xl:items-start gap-4 text-center sm:text-left lg:text-center xl:text-left">
+                <div className="flex flex-row items-center gap-4">
                   {/* Image Placeholder */}
                   <div
                     className={`w-16 h-16 sm:w-20 sm:h-20 lg:w-16 lg:h-16 xl:w-20 xl:h-20 rounded-2xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}

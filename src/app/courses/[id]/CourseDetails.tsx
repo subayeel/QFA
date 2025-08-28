@@ -275,7 +275,7 @@ function CourseDetails({
 
   return (
     <div
-      className={`relative min-h-screen`}
+      className={`relative h-screen`}
       style={{ background: courseDetails.color }}
     >
       {/* Header */}
