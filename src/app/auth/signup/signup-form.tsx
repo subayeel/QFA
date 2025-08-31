@@ -83,7 +83,7 @@ export function SignUpForm() {
   };
 
   return (
-    <Card>
+    <Card className="shadow-none border bg-white">
       <CardHeader>
         <CardTitle>Create account</CardTitle>
         <CardDescription>Choose your preferred sign up method</CardDescription>

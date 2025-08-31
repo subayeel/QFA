@@ -14,6 +14,18 @@ import ImaanLesson6 from "@/app/components/courses/Imaan/Lesson6";
 import ImaanLesson7 from "@/app/components/courses/Imaan/Lesson7";
 import ImaanLesson8 from "@/app/components/courses/Imaan/Lesson8";
 import ImaanTask1 from "@/app/components/courses/Imaan/Task1";
+import MiraclesLesson1 from "@/app/components/courses/Miracles/Lesson1";
+import MiraclesLesson2 from "@/app/components/courses/Miracles/Lesson2";
+import MiraclesLesson3 from "@/app/components/courses/Miracles/Lesson3";
+import MiraclesLesson4 from "@/app/components/courses/Miracles/Lesson4";
+import MiraclesLesson5 from "@/app/components/courses/Miracles/Lesson5";
+import MiraclesLesson6 from "@/app/components/courses/Miracles/Lesson6";
+import MiraclesLesson7 from "@/app/components/courses/Miracles/Lesson7";
+import MiraclesLesson8 from "@/app/components/courses/Miracles/Lesson8";
+import MiraclesLesson9 from "@/app/components/courses/Miracles/Lesson9";
+import MiraclesLesson10 from "@/app/components/courses/Miracles/Lesson10";
+import MiraclesLesson11 from "@/app/components/courses/Miracles/Lesson11";
+import MiraclesLesson12 from "@/app/components/courses/Miracles/Lesson12";
 
 export const salahCourse: CourseDetailsType = {
   id: "SALAH",
@@ -171,11 +183,96 @@ export const historyCourse: CourseDetailsType = {
 export const miraclesCourse: CourseDetailsType = {
   id: "MIRACLES",
   name: "Miracles",
-  description: "Understand the miracles of the prophet Muhammad (PBUH)",
+  description: "Miracles present in Quran",
   color: "#C2DAEF",
-  lessons: [],
+  lessons: [
+    {
+      id: "MiraclesLesson1",
+      lessonName: "Astronomy",
+      lessonDescription: "Astronomical Miracles in Quran",
+      lessonContent: MiraclesLesson1,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson2",
+      lessonName: "Biology",
+      lessonDescription: "Biological Miracles in Quran",
+      lessonContent: MiraclesLesson2,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson3",
+      lessonName: "Chemistry",
+      lessonDescription: "Astronomical Miracles in Quran",
+      lessonContent: MiraclesLesson3,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson4",
+      lessonName: "Cosmology",
+      lessonDescription: "Cosmological Miracles in Quran",
+      lessonContent: MiraclesLesson4,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson5",
+      lessonName: "Embryology",
+      lessonDescription: "Embryological Miracles in Quran",
+      lessonContent: MiraclesLesson5,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson6",
+      lessonName: "Geology",
+      lessonDescription: "Geological Miracles in Quran",
+      lessonContent: MiraclesLesson6,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson7",
+      lessonName: "History",
+      lessonDescription: "Historical Miracles in Quran",
+      lessonContent: MiraclesLesson7,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson8",
+      lessonName: "Mathematics",
+      lessonDescription: "Mathematical Miracles in Quran",
+      lessonContent: MiraclesLesson8,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson9",
+      lessonName: "Meteorology",
+      lessonDescription: "Meteorological Miracles in Quran",
+      lessonContent: MiraclesLesson9,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson10",
+      lessonName: "Physics",
+      lessonDescription: "Physical Miracles in Quran",
+      lessonContent: MiraclesLesson10,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson11",
+      lessonName: "Physiology",
+      lessonDescription: "Physiological Miracles in Quran",
+      lessonContent: MiraclesLesson11,
+      duration: "15m",
+    },
+    {
+      id: "MiraclesLesson12",
+      lessonName: "Zoology",
+      lessonDescription: "Zoological Miracles in Quran",
+      lessonContent: MiraclesLesson12,
+      duration: "15m",
+    },
+  ],
   tasks: [],
-  duration: "1 hour",
+  duration: "3 hrs",
   image: "/miracles-icon.png",
 };
 export const ethicsCourse: CourseDetailsType = {
@@ -211,10 +308,10 @@ export const azkaarCourse: CourseDetailsType = {
 
 export const courses = {
   IMAAN: imaanCourse,
-  SALAH: salahCourse,
-  HISTORY: historyCourse,
   MIRACLES: miraclesCourse,
-  ETHICS: ethicsCourse,
-  ARABIC: arabicCourse,
+  SALAH: salahCourse,
   AZKAAR: azkaarCourse,
+  ARABIC: arabicCourse,
+  // HISTORY: historyCourse,
+  // ETHICS: ethicsCourse,
 };

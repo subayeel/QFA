@@ -57,7 +57,7 @@ export function LoginForm() {
   };
 
   return (
-    <Card>
+    <Card className="shadow-none border bg-white">
       <CardHeader>
         <CardTitle>Sign in</CardTitle>
         <CardDescription>Choose your preferred sign in method</CardDescription>
