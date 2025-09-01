@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, BookOpen, Target } from "lucide-react";
+import { ChevronRight, Target } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { HifzProgressSummary } from "@/types/hifz.types";

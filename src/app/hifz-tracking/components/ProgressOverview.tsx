@@ -4,14 +4,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import {
-  BookOpen,
-  Target,
-  TrendingUp,
-  Calendar,
-  Award,
-  Clock,
-} from "lucide-react";
+import { BookOpen, Target, TrendingUp, Award, Clock } from "lucide-react";
 import { HifzProgressSummary } from "@/types/hifz.types";
 
 interface Props {

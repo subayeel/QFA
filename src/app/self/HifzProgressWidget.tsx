@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Target, TrendingUp, CheckCircle, Clock } from "lucide-react";
+import { BookOpen, Target, TrendingUp, Clock } from "lucide-react";
 import Link from "next/link";
 import { HifzProgressSummary } from "@/types/hifz.types";
 

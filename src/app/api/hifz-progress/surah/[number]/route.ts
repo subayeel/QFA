@@ -4,7 +4,7 @@ import { HifzProgressService } from "@/services/hifzProgressService";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { number: string } }
+  { params }: { params: Promise<{ number: string }> }
 ) {
   try {
     const session = await auth();
@@ -12,7 +12,8 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const surahNumber = parseInt(params.number);
+    const resolvedParams = await params;
+    const surahNumber = parseInt(resolvedParams.number);
     if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
       return NextResponse.json(
         { error: "Invalid surah number" },
@@ -41,7 +42,7 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { number: string } }
+  { params }: { params: Promise<{ number: string }> }
 ) {
   try {
     const session = await auth();
@@ -49,7 +50,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const surahNumber = parseInt(params.number);
+    const resolvedParams = await params;
+    const surahNumber = parseInt(resolvedParams.number);
     if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
       return NextResponse.json(
         { error: "Invalid surah number" },

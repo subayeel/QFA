@@ -7,7 +7,7 @@ export interface HifzProgress {
   memorizedVerses: number;
   isCompleted: boolean;
   lastUpdated: Date;
-  notes?: string;
+  notes: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

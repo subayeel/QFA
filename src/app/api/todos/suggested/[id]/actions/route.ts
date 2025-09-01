@@ -30,8 +30,6 @@ export async function POST(
     }
 
     const originalTodoId = parts[0];
-    const timestamp = parts[1];
-    const index = parts[2];
 
     // Find the original suggested todo
     const suggestedTodo = await prisma.todo.findUnique({

@@ -15,13 +15,14 @@ import {
   GraduationCap,
   Calendar,
   User,
+  BookOpen,
 } from "lucide-react";
 import Link from "next/link";
 import HifzProgressWidget from "./HifzProgressWidget";
 
 export default async function UserProfilePage() {
   const session = await auth();
-  const BASE_URL = "https://doses-of-imaan.vercel.app";
+
   if (!session?.user) {
     redirect("/auth/login");
   }

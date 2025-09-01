@@ -1,14 +1,7 @@
 "use client";
 /* eslint-disable react/no-unescaped-entities */
 import { Card } from "@/components/ui/card";
-import {
-  Bell,
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  Download,
-  MapPin,
-} from "lucide-react";
+import { Bell, ChevronDown, Clock, Download, MapPin } from "lucide-react";
 
 import { useState, useEffect, useCallback } from "react";
 import { UserTodo, TodoFilter } from "@/types/todos.types";
