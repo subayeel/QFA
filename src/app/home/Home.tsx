@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/carousel";
 import { SignOutButton } from "@/app/components/SignOutButton";
 import Image from "next/image";
+import HifzProgressCard from "./HifzProgressCard";
 
 function Home() {
   const [todos, setTodos] = useState<UserTodo[]>([]);
@@ -433,39 +434,7 @@ function Home() {
               </CarouselItem>
 
               <CarouselItem className="md:basis-1/2">
-                <Card className="bg-white shadow-none relative p-4 overflow-hidden h-[150px] mx-6">
-                  <div className="flex flex-col justify-between h-full">
-                    <div>
-                      <div className="flex gap-2 items-center mb-4">
-                        <p className="text-lg sm:text-2xl font-semibold">
-                          Hifz Completion
-                        </p>
-                        <ChevronRight className="text-textGray" size={20} />
-                      </div>
-
-                      <div className="space-y-2">
-                        <p className="text-sm">Last read Al-Baqrah 117</p>
-
-                        <div className="flex gap-2 items-center">
-                          <div className="h-2 rounded-full flex w-full relative overflow-hidden bg-gray-200 max-w-[140px] sm:max-w-[220px]">
-                            <div className="absolute top-0 bg-teal-900 h-2 w-[20%] z-[10]"></div>
-                          </div>
-                          <p className="font-semibold">4%</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="absolute right-0 bottom-0">
-                      <Image
-                        src={"/home-quran.png"}
-                        className="object-contain h-16 sm:h-24"
-                        alt="quran"
-                        width={70}
-                        height={100}
-                      />
-                    </div>
-                  </div>
-                </Card>
+                <HifzProgressCard isMobile={true} />
               </CarouselItem>
             </CarouselContent>
 
@@ -532,39 +501,7 @@ function Home() {
             </div>
           </Card>
 
-          <Card className="bg-white relative p-6 overflow-hidden h-[180px]">
-            <div className="flex flex-col justify-between h-full">
-              <div>
-                <div className="flex gap-2 items-center mb-4">
-                  <p className="text-xl font-semibold">Hifz Completion</p>
-                  <ChevronRight className="text-textGray" size={20} />
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-base text-gray-600">
-                    Last read Al-Baqrah 117
-                  </p>
-
-                  <div className="flex gap-3 items-center">
-                    <div className="h-3 rounded-full flex w-full relative overflow-hidden bg-gray-200 max-w-[200px]">
-                      <div className="absolute top-0 bg-teal-900 h-3 w-[20%] z-[10]"></div>
-                    </div>
-                    <p className="font-semibold text-lg">4%</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="absolute right-4 bottom-4">
-                <Image
-                  src="/home-quran.png"
-                  className="object-contain h-16"
-                  alt="quran"
-                  width={250}
-                  height={250}
-                />
-              </div>
-            </div>
-          </Card>
+          <HifzProgressCard />
         </div>
       </div>
 

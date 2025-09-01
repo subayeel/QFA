@@ -19,6 +19,8 @@ model User {
   // Optional for WebAuthn support
   Authenticator Authenticator[]
   userTodos     UserTodo[]
+  donations     Donation[]
+  hifzProgress  HifzProgress[]
   
   // Course progress tracking - arrays of completed lesson and task IDs
   completedLessons String[] @default([]) // Array of lesson IDs (e.g., ["SalahLesson1", "ImaanLesson2"])
@@ -140,5 +142,125 @@ model UserTodo {
 enum Scope {
   USER
   ADMIN
+}
+
+// Charity and Donation Models
+enum DonationType {
+  ZAKAH
+  QURAN
+  ONE_PLATE
+  OLD_CLOTHES
+  OLD_BOOKS
+  CUSTOM
+}
+
+enum DonationStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum HelpRequestStatus {
+  PENDING
+  APPROVED
+  FULFILLED
+  REJECTED
+}
+
+enum HelpRequestType {
+  BOOKS
+  CLOTHES
+  FOOD
+  EDUCATION
+  MEDICAL
+  SHELTER
+  OTHER
+}
+
+// Donation records
+model Donation {
+  id          String         @id @default(cuid())
+  type        DonationType
+  amount      Float?         // For monetary donations
+  description String?        // Custom description for the donation
+  status      DonationStatus @default(PENDING)
+  
+  // Optional: Link to user if they want to track their donations
+  userId      String?
+  user        User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Anonymous donations can be made without user ID
+  anonymous   Boolean        @default(false)
+  donorName   String?        // Optional name for anonymous donations
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Help requests from people in need
+model HelpRequest {
+  id          String             @id @default(cuid())
+  type        HelpRequestType
+  title       String
+  description String
+  urgency     String             @default("medium") // "low", "medium", "high", "critical"
+  status      HelpRequestStatus  @default(PENDING)
+  
+  // Contact information (optional for anonymous requests)
+  contactName String?
+  contactEmail String?
+  contactPhone String?
+  location    String?
+  
+  // Request details
+  quantity    String?            // e.g., "2 books", "5 sets of clothes"
+  preferredDelivery String?      // "pickup", "delivery", "meetup"
+  additionalNotes String?
+  
+  // Admin notes
+  adminNotes  String?
+  fulfilledBy String?            // Admin who fulfilled the request
+  
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([urgency])
+  @@index([createdAt])
+}
+
+// Hifz Progress Tracking Model
+model HifzProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Surah and verse tracking
+  surahNumber Int      // 1-114 (Quran surah number)
+  surahName   String   // Name of the surah
+  totalVerses Int      // Total verses in this surah
+  memorizedVerses Int  // Number of verses memorized in this surah
+  
+  // Progress tracking
+  isCompleted Boolean  @default(false) // Whether the entire surah is completed
+  lastUpdated DateTime @default(now())
+  
+  // Optional notes
+  notes       String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, surahNumber]) // One record per surah per user
+  @@index([userId])
+  @@index([surahNumber])
+  @@index([isCompleted])
+  @@index([lastUpdated])
 }
 

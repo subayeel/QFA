@@ -10,16 +10,18 @@ import Image from "next/image";
 import {
   Target,
   Heart,
-  Users,
   Gift,
   Plus,
   GraduationCap,
   Calendar,
+  User,
 } from "lucide-react";
+import Link from "next/link";
+import HifzProgressWidget from "./HifzProgressWidget";
 
 export default async function UserProfilePage() {
   const session = await auth();
-
+  const BASE_URL = "https://doses-of-imaan.vercel.app";
   if (!session?.user) {
     redirect("/auth/login");
   }
@@ -49,149 +51,58 @@ export default async function UserProfilePage() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const todayTodos = await prisma.userTodo.findMany({
-    where: {
-      userId: session.user.id,
-      date: {
-        gte: today,
-        lt: tomorrow,
-      },
-      archived: false,
-    },
-    include: {
-      todo: true,
-    },
-  });
-
-  const todayStats = {
-    total: todayTodos.length,
-    completed: todayTodos.filter((todo) => todo.completed).length,
-    missed: todayTodos.filter((todo) => todo.missed).length,
-    pending: todayTodos.filter((todo) => !todo.completed && !todo.missed)
-      .length,
-  };
-
-  // Calculate category breakdown
-  const categoryStats = todayTodos.reduce((acc, userTodo) => {
-    const category = userTodo.todo.category || "personal";
-    if (!acc[category]) {
-      acc[category] = { total: 0, completed: 0, missed: 0 };
-    }
-    acc[category].total++;
-    if (userTodo.completed) acc[category].completed++;
-    if (userTodo.missed) acc[category].missed++;
-    return acc;
-  }, {} as Record<string, { total: number; completed: number; missed: number }>);
-
   // Get recent todo activity (last 7 days)
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
-
-  const recentTodos = await prisma.userTodo.findMany({
-    where: {
-      userId: session.user.id,
-      date: {
-        gte: weekAgo,
-      },
-      archived: false,
-    },
-    include: {
-      todo: true,
-    },
-    orderBy: {
-      date: "desc",
-    },
-    take: 5,
-  });
-
-  // Get overall todo statistics (all time)
-  const overallStats = await prisma.userTodo.groupBy({
-    by: ["completed", "missed", "archived"],
-    where: {
-      userId: session.user.id,
-    },
-    _count: {
-      id: true,
-    },
-  });
-
-  const overallTodoStats = {
-    total: overallStats.reduce((sum, stat) => sum + stat._count.id, 0),
-    completed:
-      overallStats.find(
-        (stat) => stat.completed && !stat.missed && !stat.archived
-      )?._count.id || 0,
-    missed:
-      overallStats.find(
-        (stat) => stat.missed && !stat.completed && !stat.archived
-      )?._count.id || 0,
-    archived: overallStats.find((stat) => stat.archived)?._count.id || 0,
-    pending:
-      overallStats.find(
-        (stat) => !stat.completed && !stat.missed && !stat.archived
-      )?._count.id || 0,
-  };
 
   const progressData = {
     courses: Object.values(courses).map((course) => {
       const courseCompletedLessons = [...new Set(user?.completedLessons)];
       const totalLessons = course.lessons.length;
-      const completedLessons = courseCompletedLessons.length;
+      let count = 0;
+      courseCompletedLessons.forEach((lesson) => {
+        if (course.lessons.flatMap((l) => l.id).includes(lesson)) {
+          count++;
+        }
+      });
       const progressPercentage =
-        totalLessons > 0
-          ? Math.round((completedLessons / totalLessons) * 100)
-          : 0;
+        totalLessons > 0 ? Math.round((count / totalLessons) * 100) : 0;
 
       return {
         name: course.name,
         progress: progressPercentage,
       };
     }),
-    hifzProgress: {
-      current: 15,
-      total: 30,
-      percentage: 50,
-    },
-    todayTodos: {
-      completed: todayStats.completed,
-      total: todayStats.total,
-      percentage:
-        todayStats.total > 0
-          ? Math.round((todayStats.completed / todayStats.total) * 100)
-          : 0,
-    },
   };
 
   const actions = [
-    {
-      title: "Assign Goals",
-      description: "Set new learning objectives",
-      icon: Target,
-      color: "bg-blue-50 text-blue-600",
-    },
     {
       title: "Create Todo",
       description: "Add new tasks to your list",
       icon: Plus,
       color: "bg-green-50 text-green-600",
+      href: "/home",
+    },
+    {
+      title: "Hifz Tracking",
+      description: "Track your Quran memorization",
+      icon: BookOpen,
+      color: "bg-teal-50 text-teal-600",
+      href: "/hifz-tracking",
     },
     {
       title: "Donate",
       description: "Support Islamic causes",
       icon: Heart,
       color: "bg-red-50 text-red-600",
+      href: "/charity/donate",
     },
     {
       title: "Request Charity",
       description: "Anonymous charity requests",
       icon: Gift,
       color: "bg-purple-50 text-purple-600",
-    },
-    {
-      title: "Guide My Friend",
-      description: "Help others in their journey",
-      icon: Users,
-      color: "bg-orange-50 text-orange-600",
+      href: "/charity/request-help",
     },
   ];
 
@@ -280,7 +191,7 @@ export default async function UserProfilePage() {
             <Card className="p-6 sm:p-8 bg-white/80 backdrop-blur-sm border shadow-none lg:col-span-1 xl:col-span-2">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
-                  Tracking Your Progress
+                  Course Progress
                 </h3>
               </div>
 
@@ -300,6 +211,9 @@ export default async function UserProfilePage() {
                 ))}
               </div>
             </Card>
+
+            {/* Hifz Progress Widget */}
+            <HifzProgressWidget />
           </div>
         </div>
 
@@ -309,30 +223,50 @@ export default async function UserProfilePage() {
             Quick Actions
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
-            {actions.map((action, index) => (
-              <Card
-                key={index}
-                className="p-4 sm:p-6 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-300 cursor-pointer group"
-              >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6">
+            <Link href="/guide">
+              <Card className="p-4 sm:p-6 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-300 cursor-pointer group">
                 <div className="flex flex-row items-center gap-4">
                   {/* Image Placeholder */}
                   <div
-                    className={`w-16 h-16 sm:w-20 sm:h-20 lg:w-16 lg:h-16 xl:w-20 xl:h-20 rounded-2xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
+                    className={`w-16 h-16 sm:w-20 sm:h-20 lg:w-16 lg:h-16 xl:w-20 xl:h-20 rounded-2xl flex items-center justify-center group-hover:scale-110 bg-amber-100 text-amber-500 transition-transform duration-300 flex-shrink-0`}
                   >
-                    <action.icon className="w-8 h-8 sm:w-10 sm:h-10 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
+                    <User className="w-8 h-8 sm:w-10 sm:h-10 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <h3 className="text-lg sm:text-xl lg:text-lg xl:text-xl font-semibold text-gray-900 m-0 mb-1 sm:mb-2">
-                      {action.title}
+                      Guide My Friend
                     </h3>
                     <p className="text-sm sm:text-base lg:text-sm xl:text-base text-gray-600">
-                      {action.description}
+                      Help others in their journey
                     </p>
                   </div>
                 </div>
               </Card>
+            </Link>
+            {actions.map((action, index) => (
+              <Link key={index} href={action.href}>
+                <Card className="p-4 sm:p-6 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-300 cursor-pointer group">
+                  <div className="flex flex-row items-center gap-4">
+                    {/* Image Placeholder */}
+                    <div
+                      className={`w-16 h-16 sm:w-20 sm:h-20 lg:w-16 lg:h-16 xl:w-20 xl:h-20 rounded-2xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
+                    >
+                      <action.icon className="w-8 h-8 sm:w-10 sm:h-10 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg sm:text-xl lg:text-lg xl:text-xl font-semibold text-gray-900 m-0 mb-1 sm:mb-2">
+                        {action.title}
+                      </h3>
+                      <p className="text-sm sm:text-base lg:text-sm xl:text-base text-gray-600">
+                        {action.description}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
