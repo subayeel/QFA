@@ -1,15 +1,9 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 import { DonationForm } from "@/app/components/charity/DonationForm";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default async function DonatePage() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/auth/login");
-  }
+  // Authentication removed
 
   return (
     <div className="min-h-screen bg-gray-50">

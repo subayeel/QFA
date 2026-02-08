@@ -1,5 +1,3 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,10 +13,7 @@ import {
 import Link from "next/link";
 
 export default async function GuidePage() {
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/auth/login");
-  }
+  // Authentication removed
 
   const guideTopics = [
     {

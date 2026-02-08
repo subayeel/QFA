@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { HifzProgressService } from "@/services/hifzProgressService";
 
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const summary = await HifzProgressService.getProgressSummary(
-      session.user.id
-    );
+    // Authentication removed - using placeholder userId
+    // You may need to adjust this based on your requirements
+    const summary = await HifzProgressService.getProgressSummary("anonymous");
     return NextResponse.json(summary);
   } catch (error) {
     console.error("Error fetching hifz progress:", error);
@@ -24,11 +18,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await request.json();
     const { surahNumber, memorizedVerses, notes } = body;
 
@@ -41,8 +30,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Authentication removed - using placeholder userId
     const updatedProgress = await HifzProgressService.updateProgress(
-      session.user.id,
+      "anonymous",
       { surahNumber, memorizedVerses, notes }
     );
 

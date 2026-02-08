@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Github, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -46,10 +46,10 @@ export function LoginForm() {
     }
   }
 
-  const handleOAuthSignIn = async (provider: "google" | "github") => {
+  const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signIn(provider, { callbackUrl: "/" });
+      await signIn("google", { callbackUrl: "/" });
     } catch {
       setError("OAuth sign in failed");
       setIsLoading(false);
@@ -102,24 +102,15 @@ export function LoginForm() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Button
-            variant="outline"
-            onClick={() => handleOAuthSignIn("google")}
-            disabled={isLoading}
-          >
-            <Mail className="mr-2 h-4 w-4" />
-            Google
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => handleOAuthSignIn("github")}
-            disabled={isLoading}
-          >
-            <Github className="mr-2 h-4 w-4" />
-            GitHub
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={handleGoogleSignIn}
+          disabled={isLoading}
+          className="w-full"
+        >
+          <Mail className="mr-2 h-4 w-4" />
+          Sign in with Google
+        </Button>
       </CardContent>
     </Card>
   );

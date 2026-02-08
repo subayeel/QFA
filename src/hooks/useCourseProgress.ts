@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
 import {
   CourseProgressService,
   CourseProgressData,
@@ -15,18 +14,14 @@ export interface UseCourseProgressReturn {
 }
 
 export function useCourseProgress(): UseCourseProgressReturn {
-  const { data: session } = useSession();
+  // Authentication removed
   const [courseProgress, setCourseProgress] =
     useState<CourseProgressData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProgress = useCallback(async () => {
-    if (!session?.user?.id) {
-      setIsLoading(false);
-      return;
-    }
-
+    // Authentication removed - always fetch progress
     try {
       setIsLoading(true);
       setError(null);
@@ -37,15 +32,11 @@ export function useCourseProgress(): UseCourseProgressReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [session?.user?.id]);
+  }, []);
 
   const completeLesson = useCallback(
     async (lessonId: string) => {
-      if (!session?.user?.id) {
-        setError("User not authenticated");
-        return;
-      }
-
+      // Authentication removed
       try {
         setError(null);
         await CourseProgressService.completeLesson(lessonId);
@@ -57,16 +48,12 @@ export function useCourseProgress(): UseCourseProgressReturn {
         );
       }
     },
-    [session?.user?.id, fetchProgress]
+    [fetchProgress]
   );
 
   const completeTask = useCallback(
     async (taskId: string) => {
-      if (!session?.user?.id) {
-        setError("User not authenticated");
-        return;
-      }
-
+      // Authentication removed
       try {
         setError(null);
         await CourseProgressService.completeTask(taskId);
@@ -78,7 +65,7 @@ export function useCourseProgress(): UseCourseProgressReturn {
         );
       }
     },
-    [session?.user?.id, fetchProgress]
+    [fetchProgress]
   );
 
   const refreshProgress = useCallback(async () => {

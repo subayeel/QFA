@@ -64,19 +64,6 @@ export class TodoService {
     };
   }
 
-  // Helper function to check if user is authenticated
-  private static async checkAuthentication(): Promise<boolean> {
-    try {
-      const response = await fetch("/api/todos/check-auth");
-      if (response.ok) {
-        const data = await response.json();
-        return data.authenticated;
-      }
-    } catch (error) {
-      console.error("Error checking authentication:", error);
-    }
-    return false;
-  }
 
   // Helper function to handle API errors
   private static handleApiError(error: any, operation: string): never {
@@ -85,11 +72,6 @@ export class TodoService {
   }
 
   static async getAllTodos(): Promise<UserTodo[]> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to fetch todos");
-    }
-
     try {
       const response = await fetch("/api/todos");
       if (!response.ok) {
@@ -107,11 +89,6 @@ export class TodoService {
     filter: TodoFilter,
     prayerTimes?: PrayerTimes
   ): Promise<UserTodo[]> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to fetch todos");
-    }
-
     try {
       const response = await fetch(`/api/todos?filter=${filter}`);
       if (!response.ok) {
@@ -138,11 +115,6 @@ export class TodoService {
   }
 
   static async createTodo(todoData: CreateTodoData): Promise<UserTodo> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to create todos");
-    }
-
     try {
       const response = await fetch("/api/todos", {
         method: "POST",
@@ -167,11 +139,6 @@ export class TodoService {
     id: string,
     updates: UpdateTodoData
   ): Promise<UserTodo | null> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to update todos");
-    }
-
     try {
       const response = await fetch(`/api/todos/${id}`, {
         method: "PATCH",
@@ -196,11 +163,6 @@ export class TodoService {
   }
 
   static async deleteTodo(id: string): Promise<boolean> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to delete todos");
-    }
-
     try {
       const response = await fetch(`/api/todos/${id}`, {
         method: "DELETE",
@@ -220,11 +182,6 @@ export class TodoService {
   }
 
   static async toggleComplete(id: string): Promise<UserTodo | null> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to update todos");
-    }
-
     try {
       // Determine the correct API endpoint based on whether it's a suggested todo
       const isSuggestedTodo = id.startsWith("suggested_");
@@ -255,11 +212,6 @@ export class TodoService {
   }
 
   static async markAsMissed(id: string): Promise<UserTodo | null> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to update todos");
-    }
-
     try {
       // Determine the correct API endpoint based on whether it's a suggested todo
       const isSuggestedTodo = id.startsWith("suggested_");
@@ -290,11 +242,6 @@ export class TodoService {
   }
 
   static async archiveTodo(id: string): Promise<UserTodo | null> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to update todos");
-    }
-
     try {
       // Determine the correct API endpoint based on whether it's a suggested todo
       const isSuggestedTodo = id.startsWith("suggested_");
@@ -325,11 +272,6 @@ export class TodoService {
   }
 
   static async unarchiveTodo(id: string): Promise<UserTodo | null> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to update todos");
-    }
-
     try {
       // Determine the correct API endpoint based on whether it's a suggested todo
       const isSuggestedTodo = id.startsWith("suggested_");
@@ -360,11 +302,6 @@ export class TodoService {
   }
 
   static async getStats(): Promise<TodoStats> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to fetch todo stats");
-    }
-
     try {
       const response = await fetch("/api/todos/stats");
       if (!response.ok) {
@@ -381,11 +318,6 @@ export class TodoService {
     date?: Date,
     filter?: "today" | "upcoming"
   ): Promise<UserTodo[]> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to fetch suggested todos");
-    }
-
     try {
       const params = new URLSearchParams();
       if (date) {
@@ -419,11 +351,6 @@ export class TodoService {
     filter: TodoFilter,
     prayerTimes?: PrayerTimes
   ): Promise<UserTodo[]> {
-    const isAuthenticated = await this.checkAuthentication();
-    if (!isAuthenticated) {
-      throw new Error("User must be authenticated to fetch todos");
-    }
-
     try {
       // Get user todos
       const userTodos = await this.getTodosByFilter(filter, prayerTimes);

@@ -99,6 +99,7 @@ export default function HifzProgressCard({ isMobile = false }: Props) {
               alt="quran"
               width={70}
               height={100}
+              style={{ width: "auto" }}
             />
           </div>
         </div>
@@ -163,6 +164,7 @@ export default function HifzProgressCard({ isMobile = false }: Props) {
               alt="quran"
               width={70}
               height={100}
+              style={{ width: "auto" }}
             />
           </div>
         </div>

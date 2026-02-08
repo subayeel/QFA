@@ -1,5 +1,3 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,11 +5,7 @@ import { Heart, HandHeart, Users, Gift } from "lucide-react";
 import Link from "next/link";
 
 export default async function CharityPage() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/auth/login");
-  }
+  // Authentication removed
 
   return (
     <div className="min-h-screen bg-gray-50">

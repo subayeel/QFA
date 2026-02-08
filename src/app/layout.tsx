@@ -68,7 +68,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${outfit.variable} antialiased pb-[80px] bg-gray-50`}>
+      <body 
+        className={`${outfit.variable} antialiased pb-[80px] bg-gray-50`}
+        suppressHydrationWarning
+      >
         <SessionProvider>{children}</SessionProvider>
         <Toaster />
         <footer className="fixed bottom-4 left-1/2 transform -translate-x-1/2  w-full px-6 max-w-[300px]">

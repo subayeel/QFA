@@ -1,13 +1,9 @@
 "use client";
 /* eslint-disable react/no-unescaped-entities */
 import { Card } from "@/components/ui/card";
-import { Bell, ChevronDown, Clock, Download, MapPin } from "lucide-react";
+import { Bell, Clock, Download, MapPin, Info, User } from "lucide-react";
 
-import { useState, useEffect, useCallback } from "react";
-import { UserTodo, TodoFilter } from "@/types/todos.types";
-import { TodoService } from "@/services/todoService";
-import TodoTile from "./TodoTile";
-import CreateTodoDrawer from "./CreateTodoDrawer";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
   getUserLocation,
@@ -15,11 +11,16 @@ import {
   getCurrentPrayerInfo,
   getIslamicDate,
   timeToMinutes,
+  calculateJamathTimes,
+  getAzaanTimes,
+  getCurrentTimePeriod,
+  getAdviceForPeriod,
   PrayerTimes,
   LocationData,
   CurrentPrayerInfo,
+  JamathTimes,
+  AzaanTimes,
 } from "@/utils/prayerTimes";
-import { shouldShowTodo } from "@/utils/timeUtils";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -29,14 +30,14 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { SignOutButton } from "@/app/components/SignOutButton";
 import Image from "next/image";
 import HifzProgressCard from "./HifzProgressCard";
+import Link from "next/link";
 
 function Home() {
-  const [todos, setTodos] = useState<UserTodo[]>([]);
-  const [currentFilter, setCurrentFilter] = useState<TodoFilter>("today");
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | undefined>();
+  const [jamathTimes, setJamathTimes] = useState<JamathTimes | undefined>();
+  const [azaanTimes, setAzaanTimes] = useState<AzaanTimes | undefined>();
   const [location, setLocation] = useState<LocationData | undefined>();
   const [currentPrayerInfo, setCurrentPrayerInfo] =
     useState<CurrentPrayerInfo | null>(null);
@@ -51,12 +52,23 @@ function Home() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [userInfo, setUserInfo] = useState<{
-    name?: string;
-    email?: string;
+  const [currentAdvice, setCurrentAdvice] = useState<{
+    name: string;
+    advice: string;
+    azkaar?: Array<{
+      title: string;
+      text: string;
+      translation: string;
+      repetitions: string;
+    }>;
+    naflPrayers?: Array<{
+      name: string;
+      rakats: number | string;
+      timing: string;
+      benefit: string;
+    }>;
   } | null>(null);
+  const [hoveredPrayer, setHoveredPrayer] = useState<string | null>(null);
 
   // Function to determine current prayer time
   const getCurrentPrayer = () => {
@@ -106,96 +118,6 @@ function Home() {
 
   const currentPrayer = getCurrentPrayer();
 
-  // Check authentication status
-  const checkAuthStatus = useCallback(async () => {
-    try {
-      const response = await fetch("/api/todos/check-auth");
-      if (response.ok) {
-        const data = await response.json();
-        setIsAuthenticated(data.authenticated);
-        if (data.authenticated && data.user) {
-          setUserInfo(data.user);
-        }
-      } else {
-        setIsAuthenticated(false);
-        setUserInfo(null);
-      }
-    } catch (error) {
-      console.error("Error checking auth status:", error);
-      setIsAuthenticated(false);
-      setUserInfo(null);
-    } finally {
-      setAuthLoading(false);
-    }
-  }, []);
-
-  const loadTodos = useCallback(async () => {
-    // Only load todos if user is authenticated
-    if (!isAuthenticated) {
-      setTodos([]);
-      return;
-    }
-
-    try {
-      // Use the new combined todos method that handles both user and suggested todos
-      const combinedTodos = await TodoService.getCombinedTodos(
-        currentFilter,
-        prayerTimes || undefined
-      );
-
-      // Filter out expired todos and apply time-based logic
-      const filteredTodos = combinedTodos.filter((todo) =>
-        shouldShowTodo(todo, prayerTimes)
-      );
-
-      setTodos(filteredTodos);
-    } catch (error) {
-      console.error("Error loading todos:", error);
-      // Show error to user
-      setError("Failed to load todos. Please try again.");
-    }
-  }, [currentFilter, prayerTimes, isAuthenticated]);
-
-  const handleTodoUpdate = async (updatedTodo: UserTodo) => {
-    try {
-      setTodos((prev) =>
-        prev.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
-      );
-      await loadTodos(); // Reload to update stats
-    } catch (error) {
-      console.error("Error updating todo:", error);
-      setError("Failed to update todo. Please try again.");
-    }
-  };
-
-  const handleTodoDelete = async (id: string) => {
-    try {
-      setTodos((prev) => prev.filter((todo) => todo.id !== id));
-      await loadTodos(); // Reload to update stats
-    } catch (error) {
-      console.error("Error deleting todo:", error);
-      setError("Failed to delete todo. Please try again.");
-    }
-  };
-
-  const handleFilterChange = (filter: TodoFilter) => {
-    setCurrentFilter(filter);
-  };
-
-  const handleTodoCreated = useCallback(async () => {
-    try {
-      await loadTodos();
-    } catch (error) {
-      console.error("Error after creating todo:", error);
-      setError("Failed to refresh todos. Please try again.");
-    }
-  }, [loadTodos]);
-
-  // Check authentication status on mount
-  useEffect(() => {
-    checkAuthStatus();
-  }, [checkAuthStatus]);
-
   // Load location and prayer times
   useEffect(() => {
     const loadLocationAndPrayerTimes = async () => {
@@ -214,6 +136,14 @@ function Home() {
         );
         setPrayerTimes(times);
 
+        // Calculate jamath times
+        const jamath = calculateJamathTimes(times);
+        setJamathTimes(jamath);
+
+        // Get azaan times
+        const azaan = getAzaanTimes(times);
+        setAzaanTimes(azaan);
+
         // Get current prayer info
         const prayerInfo = getCurrentPrayerInfo(times);
         setCurrentPrayerInfo(prayerInfo);
@@ -221,6 +151,11 @@ function Home() {
         // Get Islamic date
         const islamicDate = getIslamicDate();
         setIslamicDate(islamicDate);
+
+        // Get advice for current time period
+        const currentPeriod = getCurrentTimePeriod(times);
+        const advice = getAdviceForPeriod(currentPeriod);
+        setCurrentAdvice(advice);
       } catch (err) {
         console.error("Error loading location and prayer times:", err);
         setError(
@@ -242,11 +177,24 @@ function Home() {
         );
         setPrayerTimes(times);
 
+        // Calculate jamath times
+        const jamath = calculateJamathTimes(times);
+        setJamathTimes(jamath);
+
+        // Get azaan times
+        const azaan = getAzaanTimes(times);
+        setAzaanTimes(azaan);
+
         const prayerInfo = getCurrentPrayerInfo(times);
         setCurrentPrayerInfo(prayerInfo);
 
         const islamicDate = getIslamicDate();
         setIslamicDate(islamicDate);
+
+        // Get advice for current time period
+        const currentPeriod = getCurrentTimePeriod(times);
+        const advice = getAdviceForPeriod(currentPeriod);
+        setCurrentAdvice(advice);
       } finally {
         setLoading(false);
       }
@@ -255,39 +203,28 @@ function Home() {
     loadLocationAndPrayerTimes();
   }, [retryCount]);
 
-  // // Update prayer info and todos every minute
-  // useEffect(() => {
-  //   if (!prayerTimes) return;
-
-  //   const interval = setInterval(async () => {
-  //     const prayerInfo = getCurrentPrayerInfo(prayerTimes);
-  //     setCurrentPrayerInfo(prayerInfo);
-
-  //     // Reload todos to handle time-based changes (only if authenticated)
-  //     if (isAuthenticated) {
-  //       await loadTodos();
-  //     }
-  //   }, 60000); // Update every minute
-
-  //   return () => clearInterval(interval);
-  // }, [prayerTimes, loadTodos, isAuthenticated]);
-
-  useEffect(() => {
-    loadTodos();
-  }, [currentFilter, prayerTimes, loadTodos, isAuthenticated]);
 
   // Carousel auto-scroll effect
   useEffect(() => {
     if (!api) return;
 
-    api.on("select", () => {
+    const onSelect = () => {
       setCurrent(api.selectedScrollSnap());
-    });
+    };
 
-    api.on("init", () => {
+    const onInit = () => {
       setCount(api.scrollSnapList().length);
       setCurrent(api.selectedScrollSnap());
-    });
+    };
+
+    api.on("select", onSelect);
+    api.on("init", onInit);
+
+    // Cleanup: remove event listeners when component unmounts or api changes
+    return () => {
+      api.off("select", onSelect);
+      api.off("init", onInit);
+    };
   }, [api]);
 
   // Auto-scroll every 5 seconds
@@ -301,44 +238,6 @@ function Home() {
     return () => clearInterval(interval);
   }, [api]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const dayAfterTomorrow = new Date(today);
-    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-
-    if (date.toDateString() === today.toDateString()) {
-      return "Today";
-    } else if (date.toDateString() === tomorrow.toDateString()) {
-      return "Tomorrow";
-    } else if (date.toDateString() === dayAfterTomorrow.toDateString()) {
-      return "Day After Tomorrow";
-    } else {
-      return date.toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "short",
-        day: "numeric",
-      });
-    }
-  };
-
-  const groupTodosByDate = (todos: UserTodo[]) => {
-    const groups: { [key: string]: UserTodo[] } = {};
-
-    todos.forEach((todo) => {
-      const dateKey = todo.date.split("T")[0];
-      if (!groups[dateKey]) {
-        groups[dateKey] = [];
-      }
-      groups[dateKey].push(todo);
-    });
-
-    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
-  };
-
-  const groupedTodos = groupTodosByDate(todos);
 
   return (
     <div className="max-w-7xl mx-auto bg-gray-50">
@@ -347,16 +246,13 @@ function Home() {
         <div className="text-black/80">
           <p className="text-xl lg:text-2xl">Assalamualaikum,</p>
           <p className="text-3xl lg:text-4xl font-semibold tracking-wide">
-            {!authLoading && isAuthenticated && userInfo?.name
-              ? userInfo.name
-              : "Abdul Qadir"}
+            Abdul Qadir
           </p>
         </div>
-
-        <div className="flex text-greyText gap-4 items-center">
-          <Bell size={24} className="lg:w-6 lg:h-6" />
-          {!authLoading && isAuthenticated && <SignOutButton />}
-        </div>
+        
+        <Link href="/self" className="flex text-greyText gap-4 items-center">
+          <User size={24} className="lg:w-6 lg:h-6" />
+        </Link>
       </div>
 
       {/* Hifz Card, Status, Announcement - Mobile Carousel / Desktop Grid */}
@@ -402,6 +298,7 @@ function Home() {
                         alt="salah"
                         width={100}
                         height={100}
+                        priority
                       />
                     </div>
                   </div>
@@ -475,6 +372,7 @@ function Home() {
                   alt="salah"
                   width={100}
                   height={100}
+                  priority
                 />
               </div>
             </div>
@@ -521,12 +419,12 @@ function Home() {
           <p className="text-xl font-semibold text-black/70 lg:text-2xl">
             Prayer Time
           </p>
-          <div className="flex gap-1 items-center">
-            <MapPin color="red" size={18} className="lg:w-5 lg:h-5" />{" "}
-            <span className="text-md text-greyText font-semibold lg:text-lg">
+          <div className="flex gap-1 items-center text-greyText">
+            <MapPin size={16} className="lg:w-5 lg:h-5" />{" "}
+            <span className="text-md  font-semibold lg:text-lg">
               {loading ? "Loading..." : location?.city || "Unknown Location"}
             </span>
-            <ChevronDown size={18} className="text-greyText lg:w-5 lg:h-5" />
+            {/* <ChevronDown size={18} className="text-greyText lg:w-5 lg:h-5" /> */}
           </div>
         </div>
         <Card className="bg-white lg:max-w-4xl lg:mx-auto">
@@ -584,244 +482,105 @@ function Home() {
                 className="object-contain h-28 sm:h-40 lg:h-48"
                 width={150}
                 height={250}
+                style={{ width: "auto" }}
               />
             </div>
           </Card>
           <div className="px-6 py-5 lg:px-8 lg:py-6">
             <div className="grid grid-cols-5 gap-4 lg:gap-6">
-              <div className="space-y-2 text-center">
-                <p className={`text-sm font-medium text-gray-500 lg:text-base`}>
-                  Fajr
-                </p>
-                <div className="flex justify-center">
-                  <Image
-                    src={"/fajr-icon.svg"}
-                    alt="Fajr"
-                    className={`w-8 h-8 lg:w-10 lg:h-10 ${
-                      currentPrayer === "fajr"
-                        ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[160deg]"
-                        : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
-                    }`}
-                    width={20}
-                    height={20}
-                  />
+              {(["fajr", "dhuhr", "asr", "maghrib", "isha"] as const).map((prayer) => (
+                <div
+                  key={prayer}
+                  className="space-y-2 text-center relative"
+                  onMouseEnter={() => setHoveredPrayer(prayer)}
+                  onMouseLeave={() => setHoveredPrayer(null)}
+                >
+                  <p className={`text-sm font-medium text-gray-500 lg:text-base`}>
+                    {prayer.charAt(0).toUpperCase() + prayer.slice(1)}
+                  </p>
+                  <div className="flex justify-center relative">
+                    <Image
+                      src={`/${prayer}-icon.svg`}
+                      alt={prayer}
+                      className={`w-8 h-8 lg:w-10 lg:h-10 ${
+                        currentPrayer === prayer
+                          ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[160deg]"
+                          : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
+                      }`}
+                      width={20}
+                      height={20}
+                    />
+                    {hoveredPrayer === prayer && azaanTimes && (
+                      <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                        Azaan: {azaanTimes[prayer]}
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <p className={`text-sm text-gray-500 lg:text-base`}>
+                      {loading ? "..." : prayerTimes?.[prayer] || "--:--"}
+                    </p>
+                    {jamathTimes && (
+                      <p className="text-xs text-gray-400 lg:text-sm">
+                        Jamath: {jamathTimes[prayer]}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <p className={`text-sm text-gray-500 lg:text-base`}>
-                  {loading ? "..." : prayerTimes?.fajr || "--:--"}
-                </p>
-              </div>
-              <div className="space-y-2 text-center">
-                <p className={`text-sm font-medium text-gray-500 lg:text-base`}>
-                  Dhuhr
-                </p>
-                <div className="flex justify-center">
-                  <Image
-                    src={"/dhuhr-icon.svg"}
-                    alt="Dhuhr"
-                    className={`w-8 h-8 lg:w-10 lg:h-10 ${
-                      currentPrayer === "dhuhr"
-                        ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[240deg]"
-                        : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
-                    }`}
-                    width={20}
-                    height={20}
-                  />
-                </div>
-                <p className={`text-sm text-gray-500 lg:text-base`}>
-                  {loading ? "..." : prayerTimes?.dhuhr || "--:--"}
-                </p>
-              </div>
-              <div className="space-y-2 text-center">
-                <p className={`text-sm font-medium text-gray-500 lg:text-base`}>
-                  Asr
-                </p>
-                <div className="flex justify-center">
-                  <Image
-                    src={"/asr-icon.svg"}
-                    alt="Asr"
-                    className={`w-8 h-8 lg:w-10 lg:h-10 ${
-                      currentPrayer === "asr"
-                        ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[160deg]"
-                        : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
-                    }`}
-                    width={20}
-                    height={20}
-                  />
-                </div>
-                <p className={`text-sm text-gray-500 lg:text-base`}>
-                  {loading ? "..." : prayerTimes?.asr || "--:--"}
-                </p>
-              </div>
-              <div className="space-y-2 text-center">
-                <p className={`text-sm font-medium text-gray-500 lg:text-base`}>
-                  Maghrib
-                </p>
-                <div className="flex justify-center">
-                  <Image
-                    src={"/maghrib-icon.svg"}
-                    alt="Maghrib"
-                    className={`w-8 h-8 lg:w-10 lg:h-10 ${
-                      currentPrayer === "maghrib"
-                        ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[160deg]"
-                        : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
-                    }`}
-                    width={20}
-                    height={20}
-                  />
-                </div>
-                <p className={`text-sm text-gray-500 lg:text-base`}>
-                  {loading ? "..." : prayerTimes?.maghrib || "--:--"}
-                </p>
-              </div>
-              <div className="space-y-2 text-center">
-                <p className={`text-sm font-medium text-gray-500 lg:text-base`}>
-                  Isha
-                </p>
-                <div className="flex justify-center">
-                  <Image
-                    src={"/isha-icon.svg"}
-                    alt="Isha"
-                    className={`w-8 h-8 lg:w-10 lg:h-10 ${
-                      currentPrayer === "isha"
-                        ? "filter brightness-0 saturate-100 invert-[0.5] sepia-[1] saturate-[5] hue-rotate-[160deg]"
-                        : "filter brightness-0 saturate-100 invert-[0.6] sepia-[0] saturate-[0] hue-rotate-[0deg]"
-                    }`}
-                    width={20}
-                    height={20}
-                  />
-                </div>
-                <p className={`text-sm text-gray-500 lg:text-base`}>
-                  {loading ? "..." : prayerTimes?.isha || "--:--"}
-                </p>
-              </div>
+              ))}
             </div>
           </div>
+          
+          {/* Advice Section */}
+          {currentAdvice && (
+            <div className="px-6 pb-5 lg:px-8 lg:pb-6 border-t pt-5">
+           
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-gray-800 mb-2 lg:text-base">
+                    {currentAdvice.name} - Azkaar & Nafl Prayers
+                  </h3>
+                  <p className="text-xs text-gray-600 mb-3 lg:text-sm">
+                    {currentAdvice.advice}
+                  </p>
+                  
+                  {currentAdvice.azkaar && currentAdvice.azkaar.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-gray-700 mb-2 lg:text-sm">
+                        Recommended Azkaar:
+                      </p>
+                      <div className="space-y-2">
+                      {currentAdvice.azkaar.slice(0, 2).map((azkar) => (
+                        <div key={azkar.title} className="bg-gray-50 p-2 rounded text-xs lg:text-sm">
+                            <p className="font-medium text-gray-800">{azkar.title}</p>
+                            <p className="text-gray-600 mt-1">{azkar.text}</p>
+                            <p className="text-gray-500 italic mt-1">{azkar.translation}</p>
+                            <p className="text-gray-400 text-xs mt-1">{azkar.repetitions}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {currentAdvice.naflPrayers && currentAdvice.naflPrayers.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-700 mb-2 lg:text-sm">
+                        Recommended Nafl Prayers:
+                      </p>
+                      <div className="space-y-1">
+                        {currentAdvice.naflPrayers.map((nafl) => (
+                          <div key={nafl.name} className="text-xs text-gray-600 lg:text-sm">
+                            <span className="font-medium">{nafl.name}</span> ({nafl.rakats} rakats) - {nafl.timing}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              
+            </div>
+          )}
         </Card>
       </div>
-
-      {/* Task For today - Only show if authenticated */}
-      {!authLoading && isAuthenticated && (
-        <div className="px-6 space-y-4 lg:px-8 lg:space-y-6">
-          <div className="flex justify-between items-center lg:max-w-4xl lg:mx-auto">
-            <div className="flex gap-2 py-1">
-              <span
-                className={cn(
-                  "px-3 py-1 shadow rounded-full text-sm border font-medium hover:cursor-pointer hover:bg-secondary/50 lg:px-4 lg:py-2 lg:text-base",
-                  currentFilter === "today"
-                    ? "bg-secondary text-black"
-                    : "bg-white text-black"
-                )}
-                onClick={() => handleFilterChange("today")}
-              >
-                Today
-              </span>
-              <span
-                className={cn(
-                  "px-3 py-1 shadow rounded-full text-sm border font-medium hover:cursor-pointer hover:bg-secondary/50 lg:px-4 lg:py-2 lg:text-base",
-                  currentFilter === "upcoming"
-                    ? "bg-secondary text-black"
-                    : "bg-white text-black"
-                )}
-                onClick={() => handleFilterChange("upcoming")}
-              >
-                Upcoming
-              </span>
-              <span
-                className={cn(
-                  "px-3 py-1 shadow rounded-full text-sm border font-medium hover:cursor-pointer hover:bg-secondary/50 lg:px-4 lg:py-2 lg:text-base",
-                  currentFilter === "archived"
-                    ? "bg-secondary text-black"
-                    : "bg-white text-black"
-                )}
-                onClick={() => handleFilterChange("archived")}
-              >
-                Archived
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="items-center gap-1 text-xs text-gray-500 lg:text-sm hidden lg:flex">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>Live</span>
-              </div>
-              <CreateTodoDrawer onTodoCreated={handleTodoCreated} />
-            </div>
-          </div>
-
-          {/* Todos List */}
-          <div className="space-y-3 lg:max-w-4xl lg:mx-auto">
-            {groupedTodos.length === 0 ? (
-              <Card className="shadow-none border p-8 text-center lg:p-12">
-                <p className="text-gray-500 lg:text-lg">
-                  {currentFilter === "today" && "No todos for today"}
-                  {currentFilter === "upcoming" && "No upcoming todos"}
-                  {currentFilter === "archived" && "No archived todos"}
-                </p>
-              </Card>
-            ) : (
-              groupedTodos.map(([dateKey, dateTodos]) => (
-                <div key={dateKey} className="space-y-2">
-                  <h3 className="text-sm font-medium text-gray-700 px-1 lg:text-base">
-                    {formatDate(dateKey)}
-                  </h3>
-
-                  {dateTodos.map((todo) => (
-                    <TodoTile
-                      key={todo.id}
-                      todo={todo}
-                      onUpdate={handleTodoUpdate}
-                      onDelete={handleTodoDelete}
-                      onTodoUpdated={handleTodoCreated}
-                      prayerTimes={prayerTimes}
-                    />
-                  ))}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Show loading while checking authentication */}
-      {authLoading && (
-        <div className="px-6 py-8 lg:px-8 lg:py-12">
-          <div className="max-w-4xl mx-auto">
-            <Card className="shadow-none border p-8 text-center lg:p-12">
-              <div className="space-y-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
-                <p className="text-gray-600">Checking authentication...</p>
-              </div>
-            </Card>
-          </div>
-        </div>
-      )}
-
-      {/* Show login prompt if not authenticated */}
-      {!authLoading && !isAuthenticated && (
-        <div className="px-6 py-8 lg:px-8 lg:py-12">
-          <div className="max-w-4xl mx-auto">
-            <Card className="shadow-none border p-8 text-center lg:p-12">
-              <div className="space-y-4">
-                <h2 className="text-2xl font-semibold text-gray-900 lg:text-3xl">
-                  Sign in to Manage Your Todos
-                </h2>
-                <p className="text-gray-600 lg:text-lg">
-                  Create and manage your daily Islamic tasks, track your
-                  progress, and stay organized with your spiritual routine.
-                </p>
-                <div className="flex justify-center">
-                  <Button
-                    onClick={() => (window.location.href = "/auth/login")}
-                    className="px-6 py-2"
-                  >
-                    Sign In
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

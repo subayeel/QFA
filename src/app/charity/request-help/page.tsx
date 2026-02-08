@@ -1,15 +1,9 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 import { HelpRequestForm } from "@/app/components/charity/HelpRequestForm";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default async function RequestHelpPage() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/auth/login");
-  }
+  // Authentication removed
 
   return (
     <div className="min-h-screen bg-gray-50">

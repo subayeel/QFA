@@ -1,0 +1,222 @@
+{
+  "timePeriods": [
+    {
+      "period": "fajr",
+      "name": "Fajr (Dawn)",
+      "timeRange": "Before sunrise",
+      "azkaar": [
+        {
+          "title": "Morning Dhikr",
+          "text": "أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ",
+          "translation": "I seek forgiveness from Allah, the Most Great",
+          "repetitions": "100 times"
+        },
+        {
+          "title": "Subhan Allah",
+          "text": "سُبْحَانَ اللَّهِ",
+          "translation": "Glory be to Allah",
+          "repetitions": "33 times"
+        },
+        {
+          "title": "Alhamdulillah",
+          "text": "الْحَمْدُ لِلَّهِ",
+          "translation": "All praise is due to Allah",
+          "repetitions": "33 times"
+        },
+        {
+          "title": "Allahu Akbar",
+          "text": "اللَّهُ أَكْبَرُ",
+          "translation": "Allah is the Greatest",
+          "repetitions": "33 times"
+        }
+      ],
+      "naflPrayers": [
+        {
+          "name": "Fajr Sunnah",
+          "rakats": 2,
+          "timing": "Before Fajr prayer",
+          "benefit": "Highly recommended Sunnah prayer"
+        },
+        {
+          "name": "Duha (Ishraq)",
+          "rakats": "2-12",
+          "timing": "15-20 minutes after sunrise",
+          "benefit": "Great reward, equivalent to charity for every joint in the body"
+        }
+      ],
+      "advice": "Recite morning adhkar after Fajr prayer. The time between Fajr and sunrise is blessed. Perform Duha prayer for abundant rewards."
+    },
+    {
+      "period": "dhuhr",
+      "name": "Dhuhr (Noon)",
+      "timeRange": "After midday until Asr",
+      "azkaar": [
+        {
+          "title": "Midday Dhikr",
+          "text": "لَا إِلَٰهَ إِلَّا اللَّهُ",
+          "translation": "There is no deity except Allah",
+          "repetitions": "100 times"
+        },
+        {
+          "title": "Astaghfirullah",
+          "text": "أَسْتَغْفِرُ اللَّهَ",
+          "translation": "I seek forgiveness from Allah",
+          "repetitions": "100 times"
+        },
+        {
+          "title": "Salawat",
+          "text": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ",
+          "translation": "O Allah, send blessings upon Muhammad",
+          "repetitions": "10 times"
+        }
+      ],
+      "naflPrayers": [
+        {
+          "name": "Dhuhr Sunnah (Before)",
+          "rakats": 4,
+          "timing": "Before Dhuhr prayer",
+          "benefit": "Highly recommended Sunnah prayer"
+        },
+        {
+          "name": "Dhuhr Sunnah (After)",
+          "rakats": 2,
+          "timing": "After Dhuhr prayer",
+          "benefit": "Recommended Sunnah prayer"
+        }
+      ],
+      "advice": "Perform the Sunnah prayers before and after Dhuhr. This is a good time for dhikr and seeking forgiveness. Recite Salawat upon the Prophet (peace be upon him)."
+    },
+    {
+      "period": "asr",
+      "name": "Asr (Afternoon)",
+      "timeRange": "After Asr until Maghrib",
+      "azkaar": [
+        {
+          "title": "Afternoon Dhikr",
+          "text": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+          "translation": "Glory be to Allah and praise be to Him",
+          "repetitions": "100 times"
+        },
+        {
+          "title": "La Hawla",
+          "text": "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+          "translation": "There is no power or strength except with Allah",
+          "repetitions": "100 times"
+        },
+        {
+          "title": "Ayat al-Kursi",
+          "text": "Recite Ayat al-Kursi",
+          "translation": "The Throne Verse (Quran 2:255)",
+          "repetitions": "Once"
+        }
+      ],
+      "naflPrayers": [
+        {
+          "name": "Asr Sunnah (Before)",
+          "rakats": 4,
+          "timing": "Before Asr prayer",
+          "benefit": "Highly recommended Sunnah prayer"
+        }
+      ],
+      "advice": "Recite Ayat al-Kursi after Asr prayer for protection. This is a blessed time for dhikr. Avoid sleeping during this time as it may cause laziness."
+    },
+    {
+      "period": "maghrib",
+      "name": "Maghrib (Sunset)",
+      "timeRange": "After sunset until Isha",
+      "azkaar": [
+        {
+          "title": "Evening Dhikr",
+          "text": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ",
+          "translation": "O Allah, You are my Lord, there is no deity except You",
+          "repetitions": "Once"
+        },
+        {
+          "title": "Subhan Allah",
+          "text": "سُبْحَانَ اللَّهِ",
+          "translation": "Glory be to Allah",
+          "repetitions": "33 times"
+        },
+        {
+          "title": "Alhamdulillah",
+          "text": "الْحَمْدُ لِلَّهِ",
+          "translation": "All praise is due to Allah",
+          "repetitions": "33 times"
+        },
+        {
+          "title": "Allahu Akbar",
+          "text": "اللَّهُ أَكْبَرُ",
+          "translation": "Allah is the Greatest",
+          "repetitions": "33 times"
+        }
+      ],
+      "naflPrayers": [
+        {
+          "name": "Maghrib Sunnah (After)",
+          "rakats": 2,
+          "timing": "After Maghrib prayer",
+          "benefit": "Highly recommended Sunnah prayer"
+        },
+        {
+          "name": "Awwabeen",
+          "rakats": "2-6",
+          "timing": "Between Maghrib and Isha",
+          "benefit": "Great reward, prayers of the repentant"
+        }
+      ],
+      "advice": "Recite evening adhkar after Maghrib prayer. The time between Maghrib and Isha is blessed. Perform Awwabeen prayer for great rewards."
+    },
+    {
+      "period": "isha",
+      "name": "Isha (Night)",
+      "timeRange": "After Isha until Fajr",
+      "azkaar": [
+        {
+          "title": "Night Dhikr",
+          "text": "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا",
+          "translation": "O Allah, by You we enter the evening and by You we enter the morning",
+          "repetitions": "Once"
+        },
+        {
+          "title": "Last 3 Surahs",
+          "text": "Recite Surah Al-Ikhlas, Al-Falaq, An-Nas",
+          "translation": "The last three chapters of the Quran",
+          "repetitions": "3 times each"
+        },
+        {
+          "title": "Ayat al-Kursi",
+          "text": "Recite Ayat al-Kursi",
+          "translation": "The Throne Verse (Quran 2:255)",
+          "repetitions": "Once"
+        },
+        {
+          "title": "Tasbih",
+          "text": "سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَٰهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ",
+          "translation": "Glory be to Allah, all praise is due to Allah, there is no deity except Allah, and Allah is the Greatest",
+          "repetitions": "33 times each"
+        }
+      ],
+      "naflPrayers": [
+        {
+          "name": "Isha Sunnah (After)",
+          "rakats": 2,
+          "timing": "After Isha prayer",
+          "benefit": "Highly recommended Sunnah prayer"
+        },
+        {
+          "name": "Witr",
+          "rakats": "1-11 (odd)",
+          "timing": "After Isha, before Fajr",
+          "benefit": "Highly recommended, the Prophet never missed it"
+        },
+        {
+          "name": "Tahajjud",
+          "rakats": "2-12",
+          "timing": "Last third of the night",
+          "benefit": "Best time for night prayer, great spiritual benefit"
+        }
+      ],
+      "advice": "Recite the last three Surahs and Ayat al-Kursi before sleeping for protection. Perform Witr prayer as it was never missed by the Prophet. Tahajjud in the last third of the night is highly meritorious."
+    }
+  ]
+}

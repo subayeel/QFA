@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { HifzProgressService } from "@/services/hifzProgressService";
 
 export async function GET(
@@ -7,11 +6,6 @@ export async function GET(
   { params }: { params: Promise<{ number: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const resolvedParams = await params;
     const surahNumber = parseInt(resolvedParams.number);
     if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
@@ -21,8 +15,9 @@ export async function GET(
       );
     }
 
+    // Authentication removed - using placeholder userId
     const progress = await HifzProgressService.getSurahProgress(
-      session.user.id,
+      "anonymous",
       surahNumber
     );
 
@@ -45,11 +40,6 @@ export async function DELETE(
   { params }: { params: Promise<{ number: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const resolvedParams = await params;
     const surahNumber = parseInt(resolvedParams.number);
     if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) {
@@ -59,7 +49,8 @@ export async function DELETE(
       );
     }
 
-    await HifzProgressService.resetSurahProgress(session.user.id, surahNumber);
+    // Authentication removed - using placeholder userId
+    await HifzProgressService.resetSurahProgress("anonymous", surahNumber);
     return NextResponse.json({ message: "Progress reset successfully" });
   } catch (error) {
     console.error("Error resetting surah progress:", error);

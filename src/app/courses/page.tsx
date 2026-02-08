@@ -1,39 +1,22 @@
 "use client";
 import { Card } from "@/components/ui/card";
 import { courses } from "@/utils/courses";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import Image from "next/image";
 import {
-  CourseProgressService,
+
   CourseProgressData,
 } from "@/services/courseProgressService";
 import Link from "next/link";
 
 function CoursesLayout() {
-  const { data: session } = useSession();
+  // Authentication removed
   const [courseProgress, setCourseProgress] = useState<CourseProgressData>({
     completedLessons: [],
     completedTasks: [],
   });
 
-  useEffect(() => {
-    const fetchCourseProgress = async () => {
-      if (!session?.user?.id) {
-        return;
-      }
 
-      try {
-        const progress = await CourseProgressService.getAllCourseProgress();
-
-        setCourseProgress(progress);
-      } catch (error) {
-        console.error("Error fetching course progress:", error);
-      }
-    };
-
-    fetchCourseProgress();
-  }, [session?.user?.id]);
   return (
     <div className="bg-gray-50">
       {/* Header */}
@@ -103,6 +86,7 @@ function CoursesLayout() {
                     className="object-contain absolute bottom-8 right-4 h-20 sm:h-32 md:h-24 lg:h-32"
                     width={100}
                     height={120}
+                    style={{ width: "auto" }}
                   />
                 </Card>
               </Link>

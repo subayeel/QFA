@@ -1,5 +1,3 @@
-"use server";
-import { auth } from "@/auth";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,87 +7,98 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Image from "next/image";
+import PrayerTimeSection from "@/components/homepage/PrayerTimeSection";
 
 export default async function Home() {
-  const session = await auth();
-
+  // Authentication removed - always show content
   return (
-    <div className="container mx-auto py-10">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-4">Welcome to QFA</h1>
-          <p className="text-xl text-muted-foreground">
-            Your modern educational platform
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto py-10">
+        <div className="max-w-4xl mx-auto">
+          {/* Hero Section */}
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-bold mb-4 text-[#214e45]">
+              Welcome to Quran For All
+            </h1>
+            <p className="text-xl text-muted-foreground mb-2">
+              Your comprehensive platform for Islamic education and spiritual growth
+            </p>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+              Discover the universal message of the Quran, learn Islamic teachings,
+              and connect with a community dedicated to spiritual growth and understanding.
+            </p>
+          </div>
 
-        {session?.user ? (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Welcome back, {session.user.name}!</CardTitle>
-                <CardDescription>
-                  You are successfully signed in to your account.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  {session.user.image && (
-                    <Image
-                      src={session.user.image}
-                      alt="Profile"
-                      className="w-12 h-12 rounded-full"
-                    />
-                  )}
-                  <div>
-                    <p className="font-medium">{session.user.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {session.user.email}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex space-x-4">
-                  <Button asChild>
-                    <Link href="/user-profile">View Profile</Link>
+          {/* Prayer Time Section */}
+          <PrayerTimeSection />
+
+          {/* Quick Actions */}
+          <div className="mt-12 space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold text-[#214e45] mb-6">
+                Explore Our Features
+              </h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-[#214e45]">Courses & Lessons</CardTitle>
+                  <CardDescription>
+                    Comprehensive Islamic education covering Quran, Tawheed, Salah, History, and more
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild className="bg-[#214e45] hover:bg-[#1a3d36]">
+                    <Link href="/courses">Explore Courses</Link>
                   </Button>
-                  <Button variant="outline" asChild>
-                    <Link href="/auth/login">Sign Out</Link>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-[#214e45]">Dashboard</CardTitle>
+                  <CardDescription>
+                    Access your personalized dashboard with todos, progress tracking, and daily inspiration
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild className="bg-[#214e45] hover:bg-[#1a3d36]">
+                    <Link href="/home">Go to Dashboard</Link>
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-[#214e45]">My Hifz</CardTitle>
+                  <CardDescription>
+                    Plan your journey to become a Hafiz with personalized scheduling based on your routine
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild variant="outline" className="border-[#214e45] text-[#214e45] hover:bg-[#214e45] hover:text-white">
+                    <Link href="/hifz-planner">Start Hifz Journey</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-[#214e45]">Charity & Community</CardTitle>
+                  <CardDescription>
+                    Give back through donations or request help anonymously. Together we grow stronger
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild variant="outline" className="border-[#214e45] text-[#214e45] hover:bg-[#214e45] hover:text-white">
+                    <Link href="/charity">Learn More</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Get Started</CardTitle>
-                <CardDescription>
-                  Create a new account to access all features
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button asChild className="w-full">
-                  <Link href="/auth/signup">Sign Up</Link>
-                </Button>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Already have an account?</CardTitle>
-                <CardDescription>
-                  Sign in to continue where you left off
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" asChild className="w-full">
-                  <Link href="/auth/login">Sign In</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

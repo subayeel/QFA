@@ -1,4 +1,3 @@
-import { prisma } from "@/lib/prisma";
 import { QURAN_SURAHS, TOTAL_QURAN_VERSES } from "@/utils/quranData";
 import type {
   HifzProgress,
@@ -9,13 +8,11 @@ import type {
 
 export class HifzProgressService {
   /**
-   * Get all hifz progress for a user
+   * Get all hifz progress for a user (Prisma removed)
    */
   static async getUserProgress(userId: string): Promise<HifzProgress[]> {
-    return await prisma.hifzProgress.findMany({
-      where: { userId },
-      orderBy: { surahNumber: "asc" },
-    });
+    // Prisma removed - returning empty array
+    return [];
   }
 
   /**
@@ -100,29 +97,17 @@ export class HifzProgressService {
 
     const isCompleted = update.memorizedVerses === surah.verses;
 
-    return await prisma.hifzProgress.upsert({
-      where: {
-        userId_surahNumber: {
-          userId,
-          surahNumber: update.surahNumber,
-        },
-      },
-      update: {
-        memorizedVerses: update.memorizedVerses,
-        isCompleted,
-        lastUpdated: new Date(),
-        notes: update.notes,
-      },
-      create: {
-        userId,
-        surahNumber: update.surahNumber,
-        surahName: surah.name,
-        totalVerses: surah.verses,
-        memorizedVerses: update.memorizedVerses,
-        isCompleted,
-        notes: update.notes,
-      },
-    });
+    // Prisma removed - returning mock data
+    return {
+      userId,
+      surahNumber: update.surahNumber,
+      surahName: surah.name,
+      totalVerses: surah.verses,
+      memorizedVerses: update.memorizedVerses,
+      isCompleted,
+      notes: update.notes || null,
+      lastUpdated: new Date(),
+    } as HifzProgress;
   }
 
   /**
@@ -132,14 +117,8 @@ export class HifzProgressService {
     userId: string,
     surahNumber: number
   ): Promise<SurahProgress | null> {
-    const progress = await prisma.hifzProgress.findUnique({
-      where: {
-        userId_surahNumber: {
-          userId,
-          surahNumber,
-        },
-      },
-    });
+    // Prisma removed - always return default progress
+    const progress = null;
 
     if (!progress) {
       const surah = QURAN_SURAHS.find((s) => s.number === surahNumber);
@@ -209,12 +188,8 @@ export class HifzProgressService {
     userId: string,
     surahNumber: number
   ): Promise<void> {
-    await prisma.hifzProgress.deleteMany({
-      where: {
-        userId,
-        surahNumber,
-      },
-    });
+    // Prisma removed - no-op
+    return;
   }
 
   /**

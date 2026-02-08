@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { HifzProgressService } from "@/services/hifzProgressService";
 
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const stats = await HifzProgressService.getProgressStats(session.user.id);
+    // Authentication removed - using placeholder userId
+    const stats = await HifzProgressService.getProgressStats("anonymous");
     const allSurahProgress = await HifzProgressService.getAllSurahProgress(
-      session.user.id
+      "anonymous"
     );
 
     return NextResponse.json({

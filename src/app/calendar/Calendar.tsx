@@ -14,6 +14,10 @@ import {
   hasSpecialEvents,
   getSpecialEventsForDate,
 } from "@/utils/hijriToGregorian";
+import {
+  getRemindersForDate,
+  getProphetPracticesForDate,
+} from "@/utils/calendarReminders";
 
 // Types for calendar data
 interface HijriDate {
@@ -513,42 +517,153 @@ function CalendarLayout() {
             </div>
           )}
 
+          {/* 2-Day Advance Reminders */}
+          {!loading &&
+            calendarData.length > 0 &&
+            getRemindersForDate(selectedDate, calendarData).length > 0 && (
+            <div className="mb-6 md:mb-8">
+              <h3 className="text-black text-lg md:text-xl font-semibold mb-4">
+                ⏰ Upcoming Reminders (2 Days Ahead)
+              </h3>
+              <div className="space-y-3 md:space-y-4">
+                {getRemindersForDate(selectedDate, calendarData).map(
+                  (reminder, index) => (
+                    <Card
+                      key={index}
+                      className="bg-yellow-50 border-yellow-200 border-2"
+                    >
+                      <CardContent className="p-4 md:p-6">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="text-black font-semibold text-base md:text-lg">
+                            {reminder.name}
+                          </h4>
+                          <Badge
+                            variant={
+                              reminder.importance === "high"
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={
+                              reminder.importance === "high"
+                                ? "bg-yellow-500 text-black"
+                                : "bg-yellow-200 text-black"
+                            }
+                          >
+                            {reminder.importance === "high"
+                              ? "High Priority"
+                              : "Medium Priority"}
+                          </Badge>
+                        </div>
+                        <p className="text-black-700 text-sm md:text-base mb-2">
+                          {reminder.reminderMessage}
+                        </p>
+                        <p className="text-black-600 text-xs md:text-sm">
+                          {reminder.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Prophet Practices Section */}
+          {!loading &&
+            calendarData.length > 0 &&
+            getProphetPracticesForDate(selectedDate, calendarData).length >
+              0 && (
+            <div className="mb-6 md:mb-8">
+              <h3 className="text-black text-lg md:text-xl font-semibold mb-4">
+                📿 Prophet's (PBUH) Practice on This Day
+              </h3>
+              <div className="space-y-3 md:space-y-4">
+                {getProphetPracticesForDate(
+                  selectedDate,
+                  calendarData
+                ).map((practice, index) => (
+                  <Card
+                    key={index}
+                    className="bg-green-50 border-green-200 border-2"
+                  >
+                    <CardContent className="p-4 md:p-6">
+                      <p className="text-black-800 text-sm md:text-base mb-4 leading-relaxed">
+                        {practice.practice}
+                      </p>
+                      <div className="mb-3">
+                        <p className="text-black-600 text-xs md:text-sm font-medium mb-2">
+                          Recommended Actions:
+                        </p>
+                        <ul className="list-disc list-inside space-y-1">
+                          {practice.actions.map((action, actionIndex) => (
+                            <li
+                              key={actionIndex}
+                              className="text-black-700 text-xs md:text-sm"
+                            >
+                              {action}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <p className="text-black-500 text-xs italic mt-3">
+                        Source: {practice.source}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Special Days List */}
           <div className="space-y-3 md:space-y-4">
+            <h3 className="text-black text-lg md:text-xl font-semibold mb-4">
+              📅 Special Events
+            </h3>
             {getSpecialDaysForDate(selectedDate).map((specialDay, index) => (
-              <div className="flex items-start justify-between" key={index}>
-                <div className="flex-1 flex items-center justify-between flex-col md:flex-row md:space-x-4">
-                  <h3 className="text-black font-medium mb-1 text-xl md:text-2xl lg:text-3xl">
-                    {specialDay.name}
-                  </h3>
-                  <div className="flex items-center space-x-2 mt-2 md:mt-0">
-                    <Badge
-                      variant="secondary"
-                      className="bg-black-600 text-black text-xs md:text-sm"
-                    >
-                      Special Day
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="border-black-400 text-black-300 text-xs md:text-sm"
-                    >
-                      Islamic Calendar
-                    </Badge>
+              <Card key={index} className="bg-white border-black-200">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 flex items-center justify-between flex-col md:flex-row md:space-x-4">
+                      <h4 className="text-black font-medium mb-1 text-xl md:text-2xl lg:text-3xl">
+                        {specialDay.name}
+                      </h4>
+                      <div className="flex items-center space-x-2 mt-2 md:mt-0">
+                        <Badge
+                          variant="secondary"
+                          className="bg-black-600 text-black text-xs md:text-sm"
+                        >
+                          Special Day
+                        </Badge>
+                        <Badge
+                          variant="outline"
+                          className="border-black-400 text-black-300 text-xs md:text-sm"
+                        >
+                          Islamic Calendar
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-
-            {getSpecialDaysForDate(selectedDate).length === 0 && (
-              <Card className="bg-black-800/50 border-black-700">
-                <CardContent className="p-4 md:p-6 text-center">
-                  <CalendarIcon className="h-8 w-8 md:h-12 md:w-12 text-black-400 mx-auto mb-2 md:mb-4" />
-                  <p className="text-black-300 text-sm md:text-base">
-                    No special events for this day
-                  </p>
                 </CardContent>
               </Card>
-            )}
+            ))}
+
+            {getSpecialDaysForDate(selectedDate).length === 0 &&
+              (!loading && calendarData.length > 0
+                ? getRemindersForDate(selectedDate, calendarData).length ===
+                    0 &&
+                  getProphetPracticesForDate(selectedDate, calendarData)
+                    .length === 0
+                : true) && (
+                <Card className="bg-black-800/50 border-black-700">
+                  <CardContent className="p-4 md:p-6 text-center">
+                    <CalendarIcon className="h-8 w-8 md:h-12 md:w-12 text-black-400 mx-auto mb-2 md:mb-4" />
+                    <p className="text-black-300 text-sm md:text-base">
+                      No special events for this day
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
           </div>
         </div>
       </div>

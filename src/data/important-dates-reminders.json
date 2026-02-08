@@ -1,0 +1,116 @@
+{
+  "importantDates": [
+    {
+      "hijriMonth": 1,
+      "hijriDay": 1,
+      "name": "Hijri New Year (1 Muharram)",
+      "description": "The beginning of the Islamic year. A time for reflection and renewal.",
+      "reminderMessage": "Hijri New Year is approaching in 2 days. Prepare for reflection and renewal.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 1,
+      "hijriDay": 10,
+      "name": "Ashura",
+      "description": "The 10th day of Muharram, a day of fasting and remembrance.",
+      "reminderMessage": "Ashura is approaching in 2 days. Consider fasting on this blessed day.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 2,
+      "hijriDay": 28,
+      "name": "Martyrdom of Sayyidina al-Hassan al-Mujtaba (ر)",
+      "description": "Commemoration of the martyrdom of Imam Hassan (may Allah be pleased with him).",
+      "reminderMessage": "The martyrdom of Imam Hassan is approaching in 2 days. Remember to send blessings.",
+      "importance": "medium"
+    },
+    {
+      "hijriMonth": 7,
+      "hijriDay": 27,
+      "name": "Isra and Mi'raj",
+      "description": "The Night Journey and Ascension of Prophet Muhammad (PBUH) to the heavens.",
+      "reminderMessage": "Isra and Mi'raj is approaching in 2 days. A night of great significance.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 9,
+      "hijriDay": 1,
+      "name": "1st Day of Ramadan",
+      "description": "The beginning of the blessed month of Ramadan.",
+      "reminderMessage": "Ramadan begins in 2 days! Prepare for fasting, prayer, and increased worship.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 9,
+      "hijriDay": 21,
+      "name": "Lailat-ul-Qadr (21st Night)",
+      "description": "The Night of Power - better than a thousand months.",
+      "reminderMessage": "Lailat-ul-Qadr (21st night) is approaching in 2 days. Seek this blessed night with worship.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 9,
+      "hijriDay": 23,
+      "name": "Lailat-ul-Qadr (23rd Night)",
+      "description": "The Night of Power - better than a thousand months.",
+      "reminderMessage": "Lailat-ul-Qadr (23rd night) is approaching in 2 days. Seek this blessed night with worship.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 9,
+      "hijriDay": 25,
+      "name": "Lailat-ul-Qadr (25th Night)",
+      "description": "The Night of Power - better than a thousand months.",
+      "reminderMessage": "Lailat-ul-Qadr (25th night) is approaching in 2 days. Seek this blessed night with worship.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 9,
+      "hijriDay": 27,
+      "name": "Lailat-ul-Qadr (27th Night)",
+      "description": "The Night of Power - better than a thousand months.",
+      "reminderMessage": "Lailat-ul-Qadr (27th night) is approaching in 2 days. Seek this blessed night with worship.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 9,
+      "hijriDay": 29,
+      "name": "Lailat-ul-Qadr (29th Night)",
+      "description": "The Night of Power - better than a thousand months.",
+      "reminderMessage": "Lailat-ul-Qadr (29th night) is approaching in 2 days. Seek this blessed night with worship.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 10,
+      "hijriDay": 1,
+      "name": "Eid-ul-Fitr",
+      "description": "The festival of breaking the fast, marking the end of Ramadan.",
+      "reminderMessage": "Eid-ul-Fitr is approaching in 2 days! Prepare for celebration and gratitude.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 12,
+      "hijriDay": 8,
+      "name": "Hajj Begins",
+      "description": "The start of the annual pilgrimage to Mecca.",
+      "reminderMessage": "Hajj begins in 2 days. Remember those performing Hajj in your prayers.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 12,
+      "hijriDay": 9,
+      "name": "Day of Arafah",
+      "description": "The most important day of Hajj, standing on the plain of Arafah.",
+      "reminderMessage": "Day of Arafah is approaching in 2 days. Fast on this day if not performing Hajj.",
+      "importance": "high"
+    },
+    {
+      "hijriMonth": 12,
+      "hijriDay": 10,
+      "name": "Eid-ul-Adha",
+      "description": "The festival of sacrifice, commemorating Prophet Ibrahim's willingness to sacrifice.",
+      "reminderMessage": "Eid-ul-Adha is approaching in 2 days! Prepare for sacrifice and celebration.",
+      "importance": "high"
+    }
+  ]
+}
